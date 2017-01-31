@@ -13,3 +13,20 @@ The code for the robot will likely be written in 3 languages: C, C++ and Python.
   2. We can use Python as an easier way to deal with making a GUI that controls the robot. GUI in C++ is generally not fun.
   3. We can use C++ for everything else that isn't GUI or direct manipulation of the robot hardware.
 
+# How to use
+
+```
+# create a folder to put the code in
+mkdir -p ~/catkin_ws
+
+# copy the repository into ~/catkin_ws/src
+git clone https://github.com/Algias/LKRoverApp.git src/
+
+cd ~/catkin_ws/src
+# set up the catkin workspace
+catkin_init_workspace
+
+# build the project
+cd ~/catkin_ws
+catkin_make
+```
