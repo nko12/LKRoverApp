@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<robot name="tesbot">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size=".4572 .8636 .1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size=".4572 .8636 .1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia
+        ixx="0.0" ixy="0.0" ixz="0.0"
+        iyy="0.0" iyz="0.0"
+        izz="0.0"/>
+    </inertial>
+  </link>
+
+  <link name="right_front_wheel">
+    <visual>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </collision>
+    <inertial>
+      <origin rpy="0 1.57075  0"/>
+      <mass value="1"/>
+      <inertia
+        ixx="0.0" ixy="0.0" ixz="0.0"
+        iyy="0.0" iyz="0.0"
+        izz="0.0"/>
+    </inertial>
+  </link>
+
+  <link name="left_front_wheel">
+    <visual>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </collision>
+    <inertial>
+      <origin rpy="0 1.57075 0"/>
+      <mass value="1"/>
+      <inertia
+        ixx="0.0" ixy="0.0" ixz="0.0"
+        iyy="0.0" iyz="0.0"
+        izz="0.0"/>
+    </inertial>
+  </link>
+
+  <link name="right_back_wheel">
+    <visual>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </collision>
+    <inertial>
+      <origin rpy="0 1.57075 0"/>
+      <mass value="1"/>
+      <inertia
+        ixx="0.0" ixy="0.0" ixz="0.0"
+        iyy="0.0" iyz="0.0"
+        izz="0.0"/>
+    </inertial>
+  </link>
+
+  <link name="left_back_wheel">
+    <visual>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length=".0635" radius="0.1016"/>
+      </geometry>
+      <origin rpy="0 1.57075 0"/>
+    </collision>
+    <inertial>
+      <origin rpy="0 1.57075 0"/>
+      <mass value="1"/>
+      <inertia
+        ixx="0.0" ixy="0.0" ixz="0.0"
+        iyy="0.0" iyz="0.0"
+        izz="0.0"/>
+    </inertial>
+  </link>
+
+  <joint name="base_to_right_front_wheel" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_front_wheel"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz=".338836 .40005 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <joint name="base_to_left_front_wheel" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_front_wheel"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="-.338836 .40005 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <joint name="base_to_right_back_wheel" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_back_wheel"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz=".3302 -.40005 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <joint name="base_to_left_back_wheel" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_back_wheel"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="-.3302 -.40005 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+</robot>
