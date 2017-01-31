@@ -12,3 +12,4 @@ The code for the robot will likely be written in 3 languages: C, C++ and Python.
   1. We can use C for direct manipulation of the components connected to the Arduino (such as motors driving the wheels).
   2. We can use Python as an easier way to deal with making a GUI that controls the robot. GUI in C++ is generally not fun.
   3. We can use C++ for everything else that isn't GUI or direct manipulation of the robot hardware.
+
