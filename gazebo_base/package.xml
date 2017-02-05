@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>tesbot_keyboard</name>
+  <name>gazebo_base</name>
   <version>0.0.0</version>
   <description>The tesbot_keyboard package</description>
 

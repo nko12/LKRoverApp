@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tesbot_keyboard)
+project(gazebo_base)
 
 add_definitions(-std=c++11)
 
@@ -128,14 +128,14 @@ include_directories(
 # add_dependencies(tesbot_keyboard ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(tesbot_keyboard_node src/tesbot_keyboard.cpp)
+add_executable(gazebo_base src/main.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(tesbot_keyboard_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tesbot_keyboard_node
+target_link_libraries(gazebo_base
   ${catkin_LIBRARIES}
 )
 
