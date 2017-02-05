@@ -21,30 +21,40 @@
 
 bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate);
 
-constexpr char kLeftBackName[] = "base_to_left_back_wheel";
-constexpr char kLeftFrontName[] = "base_to_left_front_wheel";
-constexpr char kRightBackName[] = "base_to_right_back_wheel";
-constexpr char kRightFrontName[] = "base_to_right_front_wheel";
+constexpr char kJointLeftBackName[] = "base_to_left_back_wheel";
+constexpr char kJointLeftFrontName[] = "base_to_left_front_wheel";
+constexpr char kJointRightBackName[] = "base_to_right_back_wheel";
+constexpr char kJointRightFrontName[] = "base_to_right_front_wheel";
 
+constexpr char kLinkLeftBackName[] = "tesbot::left_back_wheel";
+constexpr char kLinkLeftFrontName[] = "tesbot::left_front_wheel";
+constexpr char kLinkRightBackName[] = "tesbot::right_back_wheel";
+constexpr char kLinkRightFrontName[] = "tesbot::right_front_wheel";
+
+
+constexpr int kNumJoints = 4;
 
 class BaseController {
 public:
-  float desiredVels[4];
-  float curVels[4];
-  float curForces[4];
+  float desiredVels[kNumJoints];
+  float desiredForces[kNumJoints];
+  float curVels[kNumJoints];
+  float curForces[kNumJoints];
 
   // so the way Gazebo works means that every time you apply a force it generates
   // a new force that acts on the object
   // this means it'll gradually slow down, so this is here to figure out when
   // to consolidate forces to reduce the workload on gazebo
-  int nForceApplications[4];
+  int nForceApplications[kNumJoints];
+  const static int kMaxForceNum;
 
-  static const char* kNameOrdering[4];
+  static const char* kJointNames[kNumJoints];
+  static const char* kLinkNames[kNumJoints];
 
   ros::ServiceClient *moveJoints, *clearJoints;
 
   BaseController(): moveJoints(nullptr), clearJoints(nullptr) {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < kNumJoints; i++) {
       desiredVels[i] = curVels[i] = curForces[i] = 0.0f;
       nForceApplications[i] = 0;
     }
@@ -62,10 +72,29 @@ public:
   }
 
   void LinkStatesCallback(const gazebo_msgs::LinkStates& ls) {
-    float leftBack, leftFront, rightBack, rightFront;
     for (auto i = 0; i < ls.name.size(); i++) {
-      for (auto j = 0; j < 4; j++) {
-        if (ls.name[i].compare(BaseController::kNameOrdering[i]) == 0) {
+      if (0) {
+        ROS_INFO("%s: %f %f %f, %f %f %f %f, %f %f %f, %f %f %f",
+            ls.name[i].c_str(), 
+            ls.pose[i].position.x, ls.pose[i].position.y, ls.pose[i].position.z, 
+            ls.pose[i].orientation.x, ls.pose[i].orientation.y, 
+            ls.pose[i].orientation.z, ls.pose[i].orientation.w, 
+            ls.twist[i].linear.x, ls.twist[i].linear.y, ls.twist[i].linear.z,
+            ls.twist[i].angular.x, ls.twist[i].angular.y, ls.twist[i].angular.z);
+      }
+
+      for (auto j = 0; j < kNumJoints; j++) {
+        auto name = BaseController::kLinkNames[j];
+        if (ls.name[i].compare(name) == 0) {
+          ROS_INFO("%s: %f %f %f, %f %f %f %f\n\t%f %f %f, %f %f %f",
+              ls.name[i].c_str(), 
+              ls.pose[i].position.x, ls.pose[i].position.y, ls.pose[i].position.z, 
+              ls.pose[i].orientation.x, ls.pose[i].orientation.y, 
+              ls.pose[i].orientation.z, ls.pose[i].orientation.w, 
+              ls.twist[i].linear.x, ls.twist[i].linear.y, ls.twist[i].linear.z,
+              ls.twist[i].angular.x, ls.twist[i].angular.y, ls.twist[i].angular.z);
+
+
           // got link state
           // TODO: parse twist data
           break;
@@ -75,7 +104,7 @@ public:
 
     pidControl();
   }
-private:
+protected:
   bool isReady() {
     return moveJoints != nullptr && clearJoints != nullptr;
   }
@@ -86,14 +115,67 @@ private:
     }
     // TODO: PID calculations or whatever
   }
+
+  void setForces() {
+    if (!isReady()) {
+      ROS_WARN("BaseController::setForces() invoked before ROS client connections ready!");
+      return;
+    }
+
+    for (int i = 0; i < kNumJoints; i++) {
+      if (std::abs(desiredForces[i] - curForces[i]) > 0.001f) {
+        if (nForceApplications[i] > BaseController::kMaxForceNum) {
+          // clear forces
+          clearForce(i);
+          curForces[i] = 0.0f;
+        }
+        auto deltaForce = desiredForces[i] - curForces[i];
+        if (addForce(i, deltaForce)) {
+          curForces[i] += deltaForce;
+        } else {
+          ROS_WARN("BaseController::addForce(%d, %f) failed", i, deltaForce);
+        }
+      }
+    }
+  }
+
+  void clearForce(int i) {
+    gazebo_msgs::JointRequest cjf;
+    cjf.request.joint_name = BaseController::kJointNames[i];
+    if (!clearJoints -> call(cjf)) {
+      ROS_WARN("BaseController::clearForce(%d) failed", i);
+    }
+  }
+
+  bool addForce(int i, float f) {
+    gazebo_msgs::ApplyJointEffort aje;
+    aje.request.joint_name = BaseController::kJointNames[i];
+    aje.request.effort = f;
+    aje.request.duration = ros::Duration(-1.0f);
+    if (!moveJoints -> call(aje)) {
+      return false;
+    } else if (!aje.response.success) {
+      ROS_WARN("BaseController::addForce(%d, %f): aje request returned with %s",
+          i, f, aje.response.status_message.c_str());
+    }
+    return aje.response.success;
+  }
 };
 
-const char* BaseController::kNameOrdering[4] = {
-    kLeftFrontName,
-    kLeftBackName,
-    kRightFrontName,
-    kRightBackName
+const char* BaseController::kJointNames[kNumJoints] = {
+    kJointLeftFrontName,
+    kJointLeftBackName,
+    kJointRightFrontName,
+    kJointRightBackName
 };
+const char* BaseController::kLinkNames[kNumJoints] = {
+    kLinkLeftFrontName,
+    kLinkLeftBackName,
+    kLinkRightFrontName,
+    kLinkRightBackName
+};
+
+const int BaseController::kMaxForceNum = 5;
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "gazebo_base");
@@ -110,6 +192,7 @@ int main(int argc, char **argv) {
 
   // wait for gazebo to come up
   {
+    ROS_INFO("waiting for gazebo...");
     int timeout_count = 5;
     int timeout_time = 5;
     while (timeout_count > 0) {
@@ -125,6 +208,7 @@ int main(int argc, char **argv) {
     }
   }
 
+  ROS_INFO("spawning model...");
   // spawn the robot model in gazebo
   if (!SpawnModel(nh, nhPrivate)) {
     ROS_ERROR("unable to spawn model");
@@ -155,10 +239,7 @@ int main(int argc, char **argv) {
 
   auto r = ros::Rate(100);
 
-  while (true) {
-    ros::spinOnce();
-    r.sleep();
-  }
+  ros::spin();
 
   ros::shutdown();
 
@@ -188,7 +269,6 @@ bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate) {
   // spawn model
   std::string model_name = "";
   {
-    ROS_INFO("spawning robot..");
     auto model_spawner = nh.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_urdf_model");
     gazebo_msgs::SpawnModel sm;
     sm.request.model_name = "tesbot";
