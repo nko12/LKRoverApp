@@ -128,7 +128,7 @@ include_directories(
 # add_dependencies(tesbot_keyboard ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(gazebo_base src/main.cpp)
+add_executable(gazebo_base src/main.cpp src/BaseController.cpp src/PIDController.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

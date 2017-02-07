@@ -1,41 +1,18 @@
 #include "ros/ros.h"
 #include "ros/console.h"
 
-#include "geometry_msgs/Pose.h"
-#include "geometry_msgs/Twist.h"
-
-#include "gazebo_msgs/LinkStates.h"
-#include "gazebo_msgs/ModelStates.h"
-
 #include "gazebo_msgs/ApplyJointEffort.h"
 #include "gazebo_msgs/JointRequest.h"
 #include "gazebo_msgs/SpawnModel.h"
 
-#include <array>
-#include <chrono>
 #include <fstream>
 #include <iostream>
-#include <mutex>
 #include <sstream>
-#include <thread>
-#include <vector>
 
-#include "main.h"
+#include "BaseController.h"
+#include "PIDController.h"
 
-const char* kJointNames[kNumJoints] = {
-    kJointLeftFrontName,
-    kJointLeftBackName,
-    kJointRightFrontName,
-    kJointRightBackName
-};
-const char* kLinkNames[kNumJoints] = {
-    kLinkLeftFrontName,
-    kLinkLeftBackName,
-    kLinkRightFrontName,
-    kLinkRightBackName
-};
-
-
+bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate);
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "gazebo_base");
@@ -154,101 +131,4 @@ bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate) {
     }
   }
   return true;
-}
-
-void PIDController::pidControl() {
-  desiredForce = 0.2f;
-  setForce();
-}
-
-void PIDController::setForce() {
-  if (std::abs(desiredForce - curForce) > 0.001f) {
-    if (nForceApplications > kMaxForceNum) {
-      // clear forces
-      clearForce();
-      curForce = 0.0f;
-    }
-    auto deltaForce = desiredForce - curForce;
-    if (addForce(deltaForce)) {
-      ++nForceApplications;
-      curForce += deltaForce;
-    } else {
-      ROS_WARN("BaseController::addForce(%d, %f) failed", idx, deltaForce);
-    }
-  }
-}
-
-void PIDController::clearForce() {
-  gazebo_msgs::JointRequest cjf;
-  cjf.request.joint_name = kJointNames[idx];
-  if (!parent -> clearJoints.call(cjf)) {
-    ROS_WARN("BaseController::clearForce(%d) failed", idx);
-  }
-}
-
-bool PIDController::addForce(float f) {
-  gazebo_msgs::ApplyJointEffort aje;
-  aje.request.joint_name = kJointNames[idx];
-  aje.request.effort = f;
-  aje.request.duration = ros::Duration(-0.1f);
-  if (!parent -> moveJoints.call(aje)) {
-    return false;
-  } else if (!aje.response.success) {
-    ROS_WARN("BaseController::addForce(%d, %f): aje request returned with %s",
-        idx, f, aje.response.status_message.c_str());
-  }
-  return aje.response.success;
-}
-
-
-void BaseController::ControllerCallback(const geometry_msgs::Twist& t) {
-  // TODO: parse command
-
-  pidControl();
-}
-
-void BaseController::LinkStatesCallback(const gazebo_msgs::LinkStates& ls) {
-  static int c = 0;
-  ++c;
-
-  for (auto i = 0; i < ls.name.size(); i++) {
-    for (auto j = 0; j < kNumJoints; j++) {
-      auto name = kLinkNames[j];
-      if (ls.name[i].compare(name) == 0) {
-
-        if (c % 64 == 0) {
-        ROS_INFO("%s: %f %f %f, %f %f %f %f\n\t%f %f %f, %f %f %f",
-            ls.name[i].c_str(), 
-            ls.pose[i].position.x, ls.pose[i].position.y, ls.pose[i].position.z, 
-            ls.pose[i].orientation.x, ls.pose[i].orientation.y, 
-            ls.pose[i].orientation.z, ls.pose[i].orientation.w, 
-            ls.twist[i].linear.x, ls.twist[i].linear.y, ls.twist[i].linear.z,
-            ls.twist[i].angular.x, ls.twist[i].angular.y, ls.twist[i].angular.z);
-        }
-
-
-        // got link state
-        // TODO: parse twist data
-        break;
-      }
-    }
-  }
-
-  pidControl();
-}
-
-void BaseController::ModelStatesCallback(const gazebo_msgs::ModelStates& ms) {
-  static int c = 0;
-  ++c;
-
-  for (auto i = 0; i < ms.name.size(); i++) {
-  }
-
-  pidControl();
-}
-
-void BaseController::pidControl() {
-  for (auto &pc: pidControllers) {
-    pc.pidControl();
-  }
 }
