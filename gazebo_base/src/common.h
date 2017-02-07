@@ -3,6 +3,8 @@
 
 constexpr int kNumJoints = 4;
 
+constexpr char kRobotName[] = "tesbot";
+
 constexpr char kJointLeftBackName[] = "base_to_left_back_wheel";
 constexpr char kJointLeftFrontName[] = "base_to_left_front_wheel";
 constexpr char kJointRightBackName[] = "base_to_right_back_wheel";

@@ -10,6 +10,9 @@
 #include "gazebo_msgs/LinkStates.h"
 #include "gazebo_msgs/ModelStates.h"
 
+#include "tf2/LinearMath/Transform.h"
+#include "tf2/transform_datatypes.h"
+
 #include <array>
 
 #include "common.h"
@@ -20,7 +23,9 @@ class BaseController {
 
 protected:
   std::array<PIDController, kNumJoints> pidControllers;
-  geometry_msgs::Pose curModelPose;
+
+  tf2::Transform curModelPose;
+  std::array<tf2::Transform, kNumJoints> wheelPoses;
 
   ros::ServiceClient &moveJoints, &clearJoints;
 
