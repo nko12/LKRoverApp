@@ -1,6 +1,10 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+// TODO: get these from the URDF somehow
+constexpr float kWheelSeparation = 3.1415f;
+constexpr float kWheelRadius = 0.1016f;
+
 constexpr int kNumJoints = 4;
 
 constexpr char kRobotName[] = "tesbot";

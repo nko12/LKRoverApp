@@ -8,13 +8,19 @@
 #include "BaseController.h"
 
 void PIDController::pidControl() {
-  desiredForce = idx < 2 ? -5.0f : 5.0f;
+  // desiredForce = idx < 2 ? -5.0f : 5.0f;
   // desiredForce = 5.0f;
 
-  ROS_INFO("%d: %f", idx, parent->vels[idx]);
+  // ROS_INFO("%d: %f", idx, parent->vels[idx]);
 
   // TODO: PID code here
-  if (desiredVel < curVel) {
+  // currently doing bang-bang control with hysteresis
+  float delta = curVel - desiredVel;
+  if (std::abs(delta) < 0.2f) {
+  } else if (delta > 0.0f) {
+    desiredForce = 7.0f;
+  } else {
+    desiredForce = -7.0f;
   }
 
   setForce();
