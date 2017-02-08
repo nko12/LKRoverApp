@@ -22,7 +22,7 @@ BaseController::BaseController(
 
 void BaseController::ControllerCallback(const geometry_msgs::Twist& t) {
   float left = (t.linear.x - t.angular.z*kWheelSeparation) / kWheelRadius;
-  float right = (t.linear.x - t.angular.z*kWheelSeparation) / kWheelRadius;
+  float right = (t.linear.x + t.angular.z*kWheelSeparation) / kWheelRadius;
 
   pidControllers[0].desiredVel = left;
   pidControllers[1].desiredVel = left;
