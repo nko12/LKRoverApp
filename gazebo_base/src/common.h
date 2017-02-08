@@ -10,6 +10,8 @@ constexpr char kJointLeftFrontName[] = "base_to_left_front_wheel";
 constexpr char kJointRightBackName[] = "base_to_right_back_wheel";
 constexpr char kJointRightFrontName[] = "base_to_right_front_wheel";
 
+constexpr char kBaseLinkName[] = "tesbot::base_link";
+
 constexpr char kLinkLeftBackName[] = "tesbot::left_back_wheel";
 constexpr char kLinkLeftFrontName[] = "tesbot::left_front_wheel";
 constexpr char kLinkRightBackName[] = "tesbot::right_back_wheel";

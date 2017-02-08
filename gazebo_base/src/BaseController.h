@@ -10,8 +10,8 @@
 #include "gazebo_msgs/LinkStates.h"
 #include "gazebo_msgs/ModelStates.h"
 
-#include "tf2/LinearMath/Transform.h"
 #include "tf2/transform_datatypes.h"
+#include "tf2/utils.h"
 
 #include <array>
 
@@ -23,18 +23,16 @@ class BaseController {
 
 protected:
   std::array<PIDController, kNumJoints> pidControllers;
+  std::array<double, kNumJoints> vels;
 
-  tf2::Transform curModelPose;
-  std::array<tf2::Transform, kNumJoints> wheelPoses;
-
-  ros::ServiceClient &moveJoints, &clearJoints;
+  ros::ServiceClient &moveJoints, &clearJoints, &getJoints;
 
 public:
-  BaseController(ros::ServiceClient &mj, ros::ServiceClient &cj);
+  BaseController(ros::ServiceClient &mj, ros::ServiceClient &cj, ros::ServiceClient &gj);
 
   void ControllerCallback(const geometry_msgs::Twist& t);
-  void LinkStatesCallback(const gazebo_msgs::LinkStates& ls);
-  void ModelStatesCallback(const gazebo_msgs::ModelStates& ms);
+
+  void PollJoints();
 
 protected:
   void pidControl();

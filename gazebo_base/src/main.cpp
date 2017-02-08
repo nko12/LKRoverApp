@@ -2,6 +2,7 @@
 #include "ros/console.h"
 
 #include "gazebo_msgs/ApplyJointEffort.h"
+#include "gazebo_msgs/GetJointProperties.h"
 #include "gazebo_msgs/JointRequest.h"
 #include "gazebo_msgs/SpawnModel.h"
 
@@ -50,6 +51,7 @@ int main(int argc, char **argv) {
 
   auto aje_client = nh.serviceClient<gazebo_msgs::ApplyJointEffort>("/gazebo/apply_joint_effort", true); 
   auto cjf_client = nh.serviceClient<gazebo_msgs::JointRequest>("/gazebo/clear_joint_forces", true); 
+  auto gj_client = nh.serviceClient<gazebo_msgs::GetJointProperties>("/gazebo/get_joint_properties", true); 
 
   if (!aje_client) {
     ROS_ERROR("unable to connect to /gazebo/apply_joint_effort");
@@ -59,27 +61,22 @@ int main(int argc, char **argv) {
     ROS_ERROR("unable to connect to /gazebo/clear_joint_forces");
     return -4;
   }
+  if (!gj_client) {
+    ROS_ERROR("unable to connect to /gazebo/get_joint_properties");
+    return -9;
+  }
 
-  auto bc = BaseController(aje_client, cjf_client);
+  auto bc = BaseController(aje_client, cjf_client, gj_client);
 
   auto base_controller_sub = nh.subscribe("cmd_vel", 1, &BaseController::ControllerCallback, &bc);
 
-  // subscribe to link and model state data to do PID control
-  auto link_state = nh.subscribe("/gazebo/link_states", 1, &BaseController::LinkStatesCallback, &bc);
-  if (!link_state) {
-    ROS_ERROR("unable to subscribe to link_states");
-    return -2;
-  }
-
-  auto model_state = nh.subscribe("/gazebo/model_states", 1, &BaseController::ModelStatesCallback, &bc);
-  if (!model_state) {
-    ROS_ERROR("unable to subscribe to model_states");
-    return -7;
-  }
-
   auto r = ros::Rate(100);
 
-  ros::spin();
+  while (ros::ok()) {
+    bc.PollJoints();
+    ros::spinOnce();
+    r.sleep();
+  }
 
   ros::shutdown();
 

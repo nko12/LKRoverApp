@@ -1,12 +1,22 @@
 #include "ros/ros.h"
 #include "ros/console.h"
 
+#include "tf2/utils.h"
+
 #include "PIDController.h"
 
 #include "BaseController.h"
 
 void PIDController::pidControl() {
-  desiredForce = 0.2f;
+  desiredForce = idx < 2 ? -5.0f : 5.0f;
+  // desiredForce = 5.0f;
+
+  ROS_INFO("%d: %f", idx, parent->vels[idx]);
+
+  // TODO: PID code here
+  if (desiredVel < curVel) {
+  }
+
   setForce();
 }
 
@@ -22,7 +32,7 @@ void PIDController::setForce() {
       ++nForceApplications;
       curForce += deltaForce;
     } else {
-      ROS_WARN("BaseController::addForce(%d, %f) failed", idx, deltaForce);
+      ROS_WARN("PIDController::addForce(%d, %f) failed", idx, deltaForce);
     }
   }
 }
@@ -31,7 +41,7 @@ void PIDController::clearForce() {
   gazebo_msgs::JointRequest cjf;
   cjf.request.joint_name = kJointNames[idx];
   if (!parent -> clearJoints.call(cjf)) {
-    ROS_WARN("BaseController::clearForce(%d) failed", idx);
+    ROS_WARN("PIDController::clearForce(%d) failed", idx);
   }
 }
 
@@ -43,11 +53,8 @@ bool PIDController::addForce(float f) {
   if (!parent -> moveJoints.call(aje)) {
     return false;
   } else if (!aje.response.success) {
-    ROS_WARN("BaseController::addForce(%d, %f): aje request returned with %s",
+    ROS_WARN("PIDController::addForce(%d, %f): aje request returned with %s",
         idx, f, aje.response.status_message.c_str());
   }
   return aje.response.success;
 }
-
-
-
