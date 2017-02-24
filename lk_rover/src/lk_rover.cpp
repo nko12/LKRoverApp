@@ -1,10 +1,10 @@
 #include "lk_rover/lk_rover.h"
 
 const char* kWheelNames[] = {
-  "left_front",
-  "left_back",
-  "right_front",
-  "right_back"
+  "base_to_left_front_wheel",
+  "base_to_left_back_wheel",
+  "base_to_right_front_wheel",
+  "base_to_right_back_wheel"
 };
 
 LKRover::LKRover(): wheelEfforts{0}, wheelPoss{0}, wheelVels{0} {

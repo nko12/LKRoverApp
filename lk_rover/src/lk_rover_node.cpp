@@ -12,8 +12,8 @@ int main(int argc, char** argv) {
   auto nhPrivate = ros::NodeHandle("~");
 
   LKRover robot;
-  controller_manager::ControllerManager cm(&robot, nhPrivate);
-  cm.loadController("DiffDriveController");
+  controller_manager::ControllerManager cm(&robot, nh);
+  cm.loadController("lk_velocity_controller");
 
   auto r = ros::Rate(100);
   auto curTime = ros::Time::now();
