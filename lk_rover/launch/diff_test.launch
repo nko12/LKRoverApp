@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="lk_rover" type="lk_rover_node" name="lk_rover_node" output="screen">
+  </node>
+</launch>
