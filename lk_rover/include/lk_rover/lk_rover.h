@@ -19,9 +19,6 @@ private:
   double wheelPoss[kNumWheels];
   double wheelVels[kNumWheels];
 
-  hardware_interface::JointStateHandle stateHandles[kNumWheels];
-  hardware_interface::JointHandle commandHandles[kNumWheels];
-
   hardware_interface::VelocityJointInterface vji;
   hardware_interface::JointStateInterface jsi;
 };

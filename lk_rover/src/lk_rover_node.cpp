@@ -3,7 +3,7 @@
 
 #include "controller_manager/controller_manager.h"
 
-#include "lk_rover.h"
+#include "lk_rover/lk_rover.h"
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "lk_rover_base");
