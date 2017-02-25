@@ -3,12 +3,15 @@
 
 #include <array>
 
-#include "lk_rover/lk_rover.h"
+#include "lk_rover/common.h"
 
+// there will be two classes that inherit from this class, one to talk to the
+// Arduino, and one to talk to gazebo
+// a parameter will be used to select between them when lk_rover_node is launched
 class LKHW {
 public:
-  virtual void setPWMs(const std::array<double, kNumWheels>&);
-  virtual void getCount(std::array<double, kNumWheels>&);
+  virtual void setPWMs(const std::array<double, kNumWheels>&) = 0;
+  virtual void getCount(std::array<double, kNumWheels>&) = 0;
 };
 
 #endif
