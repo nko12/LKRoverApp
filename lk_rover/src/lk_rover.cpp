@@ -1,12 +1,5 @@
 #include "lk_rover/lk_rover.h"
 
-const char* kWheelNames[] = {
-  "base_to_left_front_wheel",
-  "base_to_left_back_wheel",
-  "base_to_right_front_wheel",
-  "base_to_right_back_wheel"
-};
-
 LKRover::LKRover(std::shared_ptr<LKHW> hw_):
     wheelAccels{}, wheelPoss{}, wheelVels{}, wheelPwms{},
     hw(hw_), lastTime(ros::Time::now()) {

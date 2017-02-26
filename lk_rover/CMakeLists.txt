@@ -134,7 +134,11 @@ include_directories(
 # add_dependencies(lk_rover ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Declare a C++ executable
-add_executable(lk_rover_node src/lk_rover_node.cpp src/lk_rover.cpp src/lk_rover_hw.cpp)
+add_executable(lk_rover_node 
+  src/lk_rover_node.cpp
+  src/lk_rover.cpp
+  src/lk_rover_hw.cpp
+  src/gazebo_hw.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
