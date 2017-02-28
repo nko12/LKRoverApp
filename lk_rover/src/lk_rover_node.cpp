@@ -1,5 +1,8 @@
 #include <fstream>
 #include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include "ros/ros.h"
 #include "ros/console.h"
@@ -7,6 +10,7 @@
 #include "gazebo_msgs/SpawnModel.h"
 
 #include "controller_manager/controller_manager.h"
+#include "controller_manager_msgs/SwitchController.h"
 
 #include "lk_rover/lk_rover.h"
 #include "lk_rover/lk_rover_hw.h"
@@ -23,7 +27,7 @@ int main(int argc, char** argv) {
   bool useGazebo = false;
   nhPrivate.param<bool>("use_gazebo", useGazebo, false);
 
-  // TODO: make this less repetitive
+  std::shared_ptr<LKHW> hw;
   if (useGazebo) {
     ROS_INFO("waiting for gazebo...");
     int timeout_count = 5;
@@ -52,23 +56,17 @@ int main(int argc, char** argv) {
       ROS_ERROR("gazebo hw init failed");
       return -8;
     }
-    LKRover robot(gazeboHW);
-    controller_manager::ControllerManager cm(&robot, nh);
-    cm.loadController("lk_velocity_controller");
-
-    auto r = ros::Rate(100);
-    auto curTime = ros::Time::now();
-    while (true) {
-      r.sleep();
-      robot.read();
-      cm.update(curTime, r.cycleTime());
-      robot.write();
-    }
+    hw = gazeboHW;
   } else {
-    LKRover robot(std::make_shared<LKRoverHW>());
-    controller_manager::ControllerManager cm(&robot, nh);
-    cm.loadController("lk_velocity_controller");
+    hw = std::make_shared<LKRoverHW>();
+  }
 
+
+  LKRover robot(hw);
+  controller_manager::ControllerManager cm(&robot, nh);
+  cm.loadController("lk_velocity_controller");
+
+  std::thread controlThread([&]() {
     auto r = ros::Rate(100);
     auto curTime = ros::Time::now();
     while (true) {
@@ -77,6 +75,17 @@ int main(int argc, char** argv) {
       cm.update(curTime, r.cycleTime());
       robot.write();
     }
+  });
+
+  auto toStart = std::vector<std::string>{"lk_velocity_controller"};
+  auto toStop = std::vector<std::string>{};
+  cm.switchController(
+      toStart,
+      toStop,
+      2); // STRICT
+
+  while (true) {
+    ros::spinOnce();
   }
 
   return 0;

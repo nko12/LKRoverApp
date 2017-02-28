@@ -47,6 +47,7 @@ void BaseController::PollJoints() {
     if (gjp.response.rate.size() >= 1) {
       vels[i] = gjp.response.rate[0];
     }
+    ROS_INFO("pos: %d %f", i, gjp.response.position[0]);
   }
 
   pidControl();

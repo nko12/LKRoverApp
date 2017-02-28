@@ -9,6 +9,7 @@ constexpr const char* kWheelNames[] = {
   "base_to_right_back_wheel"
 };
 
+constexpr double kMaxTorque = 20.0;
 
 
 #endif

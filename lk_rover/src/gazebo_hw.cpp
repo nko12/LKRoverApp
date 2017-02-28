@@ -32,8 +32,16 @@ bool GazeboHW::init(ros::NodeHandle &nh) {
 }
 
 void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts) {
+  ROS_INFO("GazeboHW::setPWMs %f %f %f %f",
+      newEfforts[0], newEfforts[1], newEfforts[2], newEfforts[3]);
   for (int i = 0; i < kNumWheels; ++i) {
-    if (std::abs(newEfforts[i] - curEfforts[i]) > kForceTol) {
+    double clippedEfforts = newEfforts[i];
+    if (newEfforts[i] > kMaxTorque) {
+      clippedEfforts = kMaxTorque;
+    } else if (newEfforts[i] < -kMaxTorque) {
+      clippedEfforts = -kMaxTorque;
+    }
+    if (std::abs(clippedEfforts - curEfforts[i]) > kForceTol) {
       if (numEfforts[i] > kMaxForceNum) {
         gazebo_msgs::JointRequest cjf;
         cjf.request.joint_name = kWheelNames[i];
@@ -43,9 +51,7 @@ void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts) {
         }
         curEfforts[i] = 0.0;
       }
-      const auto diffForce = newEfforts[i] - curEfforts[i];
-      // flip the direction on the left wheels
-      const auto deltaForce = i < 2 ? -diffForce : diffForce;
+      const auto deltaForce = clippedEfforts - curEfforts[i];
       gazebo_msgs::ApplyJointEffort aje;
       aje.request.joint_name = kWheelNames[i];
       aje.request.effort = deltaForce;
@@ -78,8 +84,7 @@ void GazeboHW::getCount(std::array<double, kNumWheels>& count) {
       continue;
     }
     // ROS_INFO("position %d, %f", i, gjp.response.position[0]);
-    // flip the direction on the left wheels
-    count[i] = i < 2 ? -gjp.response.position[0] : gjp.response.position[0];
+    count[i] = gjp.response.position[0];
   }
 }
 

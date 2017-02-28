@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   diff_drive_controller
   hardware_interface
   controller_manager
+  controller_manager_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -107,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lk_rover
- CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager
+ CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs
 #  DEPENDS system_lib
 )
 
