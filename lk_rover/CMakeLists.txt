@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(lk_rover)
 
+add_definitions(-std=c++11)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -8,6 +10,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  diff_drive_controller
+  hardware_interface
+  controller_manager
+  controller_manager_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -102,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lk_rover
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs
 #  DEPENDS system_lib
 )
 
@@ -114,6 +120,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -127,17 +134,21 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(lk_rover ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-## Declare a C++ executable
-# add_executable(lk_rover_node src/lk_rover_node.cpp)
+# Declare a C++ executable
+add_executable(lk_rover_node 
+  src/lk_rover_node.cpp
+  src/lk_rover.cpp
+  src/lk_rover_hw.cpp
+  src/gazebo_hw.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(lk_rover_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(lk_rover_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(lk_rover_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(lk_rover_node
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
