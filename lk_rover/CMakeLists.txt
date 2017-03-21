@@ -136,6 +136,7 @@ include_directories(
 
 # Declare a C++ executable
 add_executable(lk_rover_node 
+  src/lk_controller.cpp
   src/lk_rover_node.cpp
   src/lk_rover.cpp
   src/lk_rover_hw.cpp

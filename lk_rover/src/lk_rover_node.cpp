@@ -12,6 +12,7 @@
 #include "controller_manager/controller_manager.h"
 #include "controller_manager_msgs/SwitchController.h"
 
+#include "lk_rover/lk_controller.h"
 #include "lk_rover/lk_rover.h"
 #include "lk_rover/lk_rover_hw.h"
 #include "lk_rover/gazebo_hw.h"
@@ -84,7 +85,10 @@ int main(int argc, char** argv) {
       toStop,
       2); // STRICT
 
+  auto rover = LKController(nh, nhPrivate);
+
   while (true) {
+    rover.doStuff();
     ros::spinOnce();
   }
 
