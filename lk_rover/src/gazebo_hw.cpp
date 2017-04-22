@@ -4,6 +4,7 @@
 #include "gazebo_msgs/JointRequest.h"
 
 #include "lk_rover/common.h"
+#include "lk_rover/lk_rover.h"
 #include "lk_rover/gazebo_hw.h"
 
 constexpr double kForceTol = 0.001;

@@ -1,5 +1,5 @@
-#ifndef LK_ROVER_H
-#define LK_ROVER_H
+#ifndef LK_CONTROLLER_H
+#define LK_CONTROLLER_H
 
 #include "ros/ros.h"
 
