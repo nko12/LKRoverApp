@@ -1,6 +1,5 @@
-#include <ros.h>
-#include <ArduinoHardware.h>
-
+#define USE_USBCON
+#define USB_CON
 /*
  * rosserial Servo Control Example
  *
@@ -21,8 +20,11 @@
  #include <WProgram.h>
 #endif
 
-#include <Servo.h> 
 #include <ros.h>
+#include <ArduinoHardware.h>
+
+#include <Servo.h> 
+
 #include <lk_rover/AllPWMs.h>
 #include <lk_rover/AllEncoders.h>
 
@@ -36,7 +38,7 @@ Servo frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel,
 void servo_cb( const lk_rover::AllPWMs& cmd_msg){
   // TODO
   ladderSpin.write(cmd_msg.front_left);
-  digitalWrite(13, HIGH-digitalRead(13)); 
+  // digitalWrite(13, HIGH-digitalRead(13)); 
 }
 
 lk_rover::AllEncoders encoderVals;
@@ -46,9 +48,11 @@ ros::Publisher encoderPub("encoders", &encoderVals);
 
 class QuadatureEncoder {
 public:
-  QuadatureEncoder(int pinA_, int pinB_, long long unsigned int& ref): pinA(pinA_), pinB(pinB_), count(ref) {}
+  QuadatureEncoder(int pinA_, int pinB_, long long unsigned int& ref): pinA(pinA_), pinB(pinB_), count(ref), a(false) {}
   
   void init() {
+    pinMode(pinA, INPUT);
+    pinMode(pinB, INPUT);
     a = digitalRead(pinA) == HIGH;
     count = 0;
   }
@@ -110,8 +114,10 @@ void setup(){
 }
 
 void loop() {
-  getEncoderVals();
+  for(int i = 0; i < 1000; ++i) {
+    getEncoderVals();
+  }
   encoderPub.publish(&encoderVals);
   nh.spinOnce();
-  delay(1);
+  //delay(1);
 }
