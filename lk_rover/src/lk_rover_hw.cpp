@@ -1,3 +1,4 @@
+#include "lk_rover/WheelPWM.h"
 #include "lk_rover/lk_rover_hw.h"
 
 void LKRoverHW::setPWMs(const std::array<double, kNumWheels>& pwms) {
