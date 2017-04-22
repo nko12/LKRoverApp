@@ -8,7 +8,9 @@ public:
   LKController(ros::NodeHandle &nh, ros::NodeHandle &nhPrivate);
   ~LKController();
 
-  void doStuff() {;}
+  void doStuff();
 private:
   ros::NodeHandle &nh, &nhPrivate;
 };
+
+#endif

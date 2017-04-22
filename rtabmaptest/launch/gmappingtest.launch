@@ -1,0 +1,41 @@
+<launch>
+  <include file="$(find zed_wrapper)/launch/zed.launch" />
+  <group ns="gmapping">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="p2l">
+      
+    </node>
+    <node pkg="slam_gmapping" type="gmapping" name="gmapping" output="screen">
+  </group>
+  <group ns="rtabmap">
+
+    <!-- Odometry -->
+    <node pkg="rtabmap_ros" type="rgbd_odometry" name="rgbd_odometry" output="screen">
+
+      <remap from="rgb/image"       to="/zed/rgb/image_rect_color"/>
+      <remap from="depth/image"     to="/zed/depth/depth_registered"/>
+      <remap from="rgb/camera_info" to="/zed/depth/camera_info"/>
+
+      <param name="frame_id" type="string" value="zed_initial_frame"/>
+    </node>
+
+    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="--delete_db_on_start Odom/Strategy=1 Odom/GuessMotion=true Vis/EstimationType=1 Vis/CorType=1">
+          <param name="frame_id" type="string" value="zed_initial_frame"/>
+          <param name="subscribe_depth" type="bool" value="true"/>
+
+          <remap from="odom" to="/zed/odom"/>
+          <remap from="rgb/image" to="/zed/rgb/image_rect_color"/>
+          <remap from="depth/image" to="/zed/depth/depth_registered"/>
+          <remap from="rgb/camera_info" to="/zed/rgb/camera_info"/>
+
+          <param name="queue_size" type="int" value="10"/>
+
+          <!-- RTAB-Map's parameters -->
+          <param name="RGBD/AngularUpdate" type="string" value="0.05"/>
+          <param name="RGBD/LinearUpdate" type="string" value="0.05"/>
+          <param name="Rtabmap/TimeThr" type="string" value="0"/>
+          <param name="Mem/RehearsalSimilarity" type="string" value="0.45"/>
+          <param name="RGBD/OptimizeFromGraphEnd" type="string" value="true"/>
+    </node>
+  </group>
+</launch>
+
