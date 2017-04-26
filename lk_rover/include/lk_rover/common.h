@@ -10,6 +10,8 @@ constexpr const char* kWheelNames[] = {
 };
 
 constexpr double kMaxTorque = 20.0;
-
+// 90 pulses per revolution according to the Vex datasheet: 
+// https://content.vexrobotics.com/docs/instructions/276-2156-instr-0312.pdf
+constexpr double kEncoderToRadians = 2.0*3.141592/90.0;
 
 #endif

@@ -11,7 +11,7 @@
 class LKHW {
 public:
   virtual void setPWMs(const std::array<double, kNumWheels>&,
-      double dumpA, double dumpB, double ladderA, double ladderB, double spin) = 0;
+      double dumpA, double dumpB, double ladderA, double ladderB, double spin, double flap) = 0;
   virtual void getCount(std::array<double, kNumWheels>&,
       double &dumpA, double &dumpB, double &ladderA, double &ladderB) = 0;
 };

@@ -38,7 +38,8 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
     ladderPwm(0.0),
     hw(hw_),
     lastTime(ros::Time::now()),
-    spin(0.0) {
+    spin(0.0),
+    flap(0.0) {
   
   for (int i = 0; i < kNumWheels; ++i) {
     auto jsh = hardware_interface::JointStateHandle(
@@ -79,7 +80,7 @@ void LKRover::write() {
   dumpJoint.getProcessedPwms(dumpPwm, dumpA, dumpB);
   ladderJoint.getProcessedPwms(ladderPwm, ladderA, ladderB);
 
-  hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin);
+  hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin, flap);
 }
 
 void LKRover::read() {
