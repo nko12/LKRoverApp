@@ -46,47 +46,60 @@ lk_rover::AllEncoders encoderVals;
 ros::Subscriber<lk_rover::AllPWMs> wheelSub("wheels", servo_cb);
 ros::Publisher encoderPub("encoders", &encoderVals);
 
-class QuadatureEncoder {
+class Encoder {
 public:
-  QuadatureEncoder(int pinA_, int pinB_, long long unsigned int& ref): pinA(pinA_), pinB(pinB_), count(ref), a(false) {}
+  virtual void init();
+  virtual void readEncoders();
+};
+
+template <int A, int B> class QuadatureEncoder: public Encoder {
+public:
+  QuadatureEncoder(long long unsigned int& ref): count(ref) {}
+
+  static void encoderISR() {
+    if (digitalRead(B) == HIGH) {
+      ++isrCount;
+    } else {
+      --isrCount;
+    }
+  }
   
   void init() {
-    pinMode(pinA, INPUT);
-    pinMode(pinB, INPUT);
-    a = digitalRead(pinA) == HIGH;
+    pinMode(A, INPUT);
+    pinMode(B, INPUT);
     count = 0;
+    oldIsrCount = 0;
+    attachInterrupt(digitalPinToInterrupt(A), encoderISR, RISING);
   }
   
   void readEncoders() {
-    boolean newA = digitalRead(pinA) == HIGH;
-    if (!a && newA) {
-      if (digitalRead(pinB) == LOW) {
-        --count;
-      } else {
-        ++count;
-      }
-    }
-    a = newA;
+    const int curIsrCount = isrCount;
+    const int delta = curIsrCount - oldIsrCount;
+    count += static_cast<long long int>(delta);
+    oldIsrCount = curIsrCount;
   }
-  
+
   long long unsigned int &count;
 private:
-  boolean a;
-  const int pinA, pinB;
+  static volatile int isrCount;
+  int oldIsrCount;
 };
+template <int A, int B> volatile int QuadatureEncoder<A, B>::isrCount = 0;
 
 const int numQuadEncoders = 4;
 
-QuadatureEncoder encoders[numQuadEncoders] = {
-  QuadatureEncoder(22, 23, encoderVals.front_left_enc), // TODO check pins
-  QuadatureEncoder(24, 25, encoderVals.front_right_enc),
-  QuadatureEncoder(26, 27, encoderVals.back_left_enc),
-  QuadatureEncoder(28, 29, encoderVals.back_right_enc),
+QuadatureEncoder<22, 23> frontLeftEnc(encoderVals.front_left_enc);
+QuadatureEncoder<24, 25> frontRightEnc(encoderVals.front_right_enc);
+QuadatureEncoder<26, 27> backLeftEnc(encoderVals.back_left_enc);
+QuadatureEncoder<28, 29> backRightEnc(encoderVals.back_right_enc);
+
+Encoder *encoders[numQuadEncoders] = {
+  &frontLeftEnc, &frontRightEnc, &backLeftEnc, &backRightEnc
 };
 
 void getEncoderVals() {
   for (int i = 0; i < numQuadEncoders; ++i) {
-    QuadatureEncoder& enc = encoders[i];
+    Encoder& enc = *encoders[i];
     enc.readEncoders();
   }
 }
@@ -99,7 +112,7 @@ void setup(){
   nh.advertise(encoderPub);
   
   for (int i = 0; i < numQuadEncoders; ++i) {
-    QuadatureEncoder& enc = encoders[i];
+    Encoder& enc = *encoders[i];
     enc.init();
   }
   frontLeftWheel.attach(2);
@@ -114,9 +127,7 @@ void setup(){
 }
 
 void loop() {
-  for(int i = 0; i < 1000; ++i) {
-    getEncoderVals();
-  }
+  getEncoderVals();
   encoderPub.publish(&encoderVals);
   nh.spinOnce();
   //delay(1);
