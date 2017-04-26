@@ -62,10 +62,29 @@ int main(int argc, char** argv) {
     hw = std::make_shared<LKRoverHW>();
   }
 
+  ActuatorConfigs dumpConfigs = {0}, ladderConfigs = {0};
 
-  LKRover robot(hw);
+  nhPrivate.params("dump/left/min", dumpConfigs.left.min);
+  nhPrivate.params("dump/left/max", dumpConfigs.left.max);
+  nhPrivate.params("dump/left/gain", dumpConfigs.left.gain);
+  nhPrivate.params("dump/right/min", dumpConfigs.right.min);
+  nhPrivate.params("dump/right/max", dumpConfigs.right.max);
+  nhPrivate.params("dump/right/gain", dumpConfigs.right.gain);
+  nhPrivate.params("dump/diff_gain", dumpConfigs.diffGain);
+
+  nhPrivate.params("ladder/left/min", ladderConfigs.left.min);
+  nhPrivate.params("ladder/left/max", ladderConfigs.left.max);
+  nhPrivate.params("ladder/left/gain", ladderConfigs.left.gain);
+  nhPrivate.params("ladder/right/min", ladderConfigs.right.min);
+  nhPrivate.params("ladder/right/max", ladderConfigs.right.max);
+  nhPrivate.params("ladder/right/gain", ladderConfigs.right.gain);
+  nhPrivate.params("ladder/diff_gain", ladderConfigs.diffGain);
+
+  LKRover robot(hw, dumpConfigs, ladderConfigs);
   controller_manager::ControllerManager cm(&robot, nh);
   cm.loadController("lk_velocity_controller");
+  cm.loadController("lk_dump_controller");
+  cm.loadController("lk_ladder_controller");
 
   std::thread controlThread([&]() {
     auto r = ros::Rate(100);
@@ -78,7 +97,10 @@ int main(int argc, char** argv) {
     }
   });
 
-  auto toStart = std::vector<std::string>{"lk_velocity_controller"};
+  auto toStart = std::vector<std::string>{
+    "lk_velocity_controller",
+    "lk_dump_controller",
+    "lk_ladder_controller"};
   auto toStop = std::vector<std::string>{};
   cm.switchController(
       toStart,

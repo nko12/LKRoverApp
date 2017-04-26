@@ -1,7 +1,7 @@
 #include "lk_rover/lk_rover.h"
 
-TwinJoints::TwinJoints(const ActuatorConfig &a_, const ActuatorConfig &b_):
-  a(a_), b(b_), lastA(0.0), lastB(0.0) {}
+TwinJoints::TwinJoints(const ActuatorConfigs &ac):
+  a(ac.left), b(ac.right), diffGain(ac.diffGain), lastA(0.0), lastB(0.0) {}
 
 double TwinJoints::getProcessedEncoder(double inA, double inB) {
   // store the values so that they can be used for computing the necessary
@@ -17,13 +17,13 @@ void TwinJoints::getProcessedPwms(double pwm, double &outA, double &outB) {
   // basically adjust the pwm output based on the discrepancy between the two
   // measured distances
   const double diff = lastA - lastB;
-  outA = gain * pwm * (1.0 - diff);
-  outB = gain * pwm * (1.0 + diff);
+  outA = gain * pwm * (1.0 - diffGain*diff);
+  outB = gain * pwm * (1.0 + diffGain*diff);
 }
 
 LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfigs& ladder):
-    virtualDump(dump.left, dump.right),
-    virtualLadder(ladder.left, ladder.right),
+    virtualDump(dump),
+    virtualLadder(ladder),
     wheelAccels{},
     wheelPoss{},
     wheelVels{},

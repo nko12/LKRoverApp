@@ -1,3 +1,24 @@
+lk_rover_node:
+  dump:
+    left:
+      min: 0.0
+      max: 1.0
+      gain: 10.0
+    right:
+      min: 0.0
+      max: 1.0
+      gain: 10.0
+    diff_gain: 1.0
+  ladder:
+    left:
+      min: 0.0
+      max: 1.0
+      gain: 10.0
+    right:
+      min: 0.0
+      max: 1.0
+    diff_gain: 1.0
+
 lk_velocity_controller:
   type: "diff_drive_controller/DiffDriveController"
   left_wheel: ['base_to_left_front_wheel', 'base_to_left_back_wheel']
@@ -32,3 +53,11 @@ lk_velocity_controller:
       max_velocity           : 4.0   # rad/s
       has_acceleration_limits: true
       max_acceleration       : 25.0   # rad/s^2
+
+lk_dump_controller:
+  type: "position_controllers/JointPositionController"
+  joint: "dump"
+
+lk_ladder_controller:
+  type: "position_controllers/JointPositionController"
+  joint: "ladder"
