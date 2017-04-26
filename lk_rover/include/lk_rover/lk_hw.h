@@ -10,8 +10,10 @@
 // a parameter will be used to select between them when lk_rover_node is launched
 class LKHW {
 public:
-  virtual void setPWMs(const std::array<double, kNumWheels>&) = 0;
-  virtual void getCount(std::array<double, kNumWheels>&) = 0;
+  virtual void setPWMs(const std::array<double, kNumWheels>&,
+      double dumpA, double dumpB, double ladderA, double ladderB, double spin) = 0;
+  virtual void getCount(std::array<double, kNumWheels>&,
+      double &dumpA, double &dumpB, double &ladderA, double &ladderB) = 0;
 };
 
 #endif
