@@ -6,7 +6,7 @@
 
 LKRoverHW::LKRoverHW(ros::NodeHandle nh): nh(nh) {
   pubPwm = nh.advertise<lk_rover::AllPWMs>("pwms", 1);
-  subEncoders = nh.subscribe("encoders", 1, LKRoverHW::encoderCb, this);
+  subEncoders = nh.subscribe("encoders", 1, &LKRoverHW::encoderCb, this);
 }
 
 void LKRoverHW::setPWMs(const std::array<double, kNumWheels>& pwms,
@@ -54,12 +54,11 @@ void LKRoverHW::encoderCb(const lk_rover::AllEncoders& encoders) {
 }
 
 void LKRoverHW::waitForSerial() {
-  std::shared_ptr<lk_rover::AllEncoders> msg;
   ROS_INFO("waiting for serial...");
+  auto msg = ros::topic::waitForMessage<lk_rover::AllEncoders>("encoders", ros::Duration(30));
   while(!msg) {
+    ROS_WARN("attempt to get encoder message failed");
     msg = ros::topic::waitForMessage<lk_rover::AllEncoders>("encoders", ros::Duration(30));
-    if (!msg) {
-      ROS_WARN("attempt to get encoder message failed");
-    }
   }
+  ROS_INFO("serial start detected");
 }

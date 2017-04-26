@@ -17,17 +17,17 @@ void TwinJoints::getProcessedPwms(double pwm, double &outA, double &outB) {
   // basically adjust the pwm output based on the discrepancy between the two
   // measured distances
   const double diff = lastA - lastB;
-  outA = gain * pwm * (1.0 - diffGain*diff);
-  outB = gain * pwm * (1.0 + diffGain*diff);
+  outA = a.gain * pwm * (1.0 - diffGain*diff);
+  outB = b.gain * pwm * (1.0 + diffGain*diff);
 }
 
 LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfigs& ladder):
     virtualDump(dump),
     virtualLadder(ladder),
-    wheelAccels{},
-    wheelPoss{},
-    wheelVels{},
-    wheelPwms{},
+    wheelAccels(),
+    wheelPoss(),
+    wheelVels(),
+    wheelPwms(),
     dumpPos(0.0),
     dumpVel(0.0),
     dumpAccel(0.0),
@@ -67,9 +67,10 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
   registerInterface(&pji);
 
   // initialize all the PWM values
+  double dumpA, dumpB, ladderA, ladderB;
   hw->getCount(wheelPoss, dumpA, dumpB, ladderA, ladderB);
-  dumpPos = dumpJoint.getProcessedEncoder(dumpA, dumpB);
-  ladderPos = ladderJoint.getProcessedEncoder(ladderA, ladderB);
+  dumpPos = virtualDump.getProcessedEncoder(dumpA, dumpB);
+  ladderPos = virtualDump.getProcessedEncoder(ladderA, ladderB);
 }
 
 LKRover::~LKRover() {
@@ -77,8 +78,8 @@ LKRover::~LKRover() {
 
 void LKRover::write() {
   double dumpA, dumpB, ladderA, ladderB;
-  dumpJoint.getProcessedPwms(dumpPwm, dumpA, dumpB);
-  ladderJoint.getProcessedPwms(ladderPwm, ladderA, ladderB);
+  virtualDump.getProcessedPwms(dumpPwm, dumpA, dumpB);
+  virtualLadder.getProcessedPwms(ladderPwm, ladderA, ladderB);
 
   hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin, flap);
 }
@@ -92,11 +93,11 @@ void LKRover::read() {
   double dumpA, dumpB, ladderA, ladderB;
 
   hw->getCount(wheelPoss, dumpA, dumpB, ladderA, ladderB);
-  dumpPos = dumpJoint.getProcessedEncoder(dumpA, dumpB);
-  ladderPos = ladderJoint.getProcessedEncoder(ladderA, ladderB);
+  dumpPos = virtualDump.getProcessedEncoder(dumpA, dumpB);
+  ladderPos = virtualLadder.getProcessedEncoder(ladderA, ladderB);
 
   ros::Time curTime = ros::Time::now();
-  auto d = (double newPos, double old) -> double {
+  auto d = [&](double newPos, double old) -> double {
     return (newPos - old)/(curTime - lastTime).toSec();
   };
   for (int i = 0; i < kNumWheels; i++) {
@@ -107,9 +108,9 @@ void LKRover::read() {
   }
 
   dumpVel = d(dumpPos, oldDumpPos);
-  ladderVel = d(ladderPos, oldladderPos);
+  ladderVel = d(ladderPos, oldLadderPos);
   dumpAccel = d(dumpVel, oldDumpVel);
-  ladderAccel = d(ladderVel, oldladderVel);
+  ladderAccel = d(ladderVel, oldLadderVel);
 
   lastTime = curTime;
 }
