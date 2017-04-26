@@ -47,11 +47,10 @@ void LKRoverHW::getCount(std::array<double, kNumWheels>& encoderValsInRadians,
 }
 
 void LKRoverHW::encoderCb(const lk_rover::AllEncoders& encoders) {
-  encoderLock.lock();
-  {
+  if (encoderLock.try_lock()) {
     lastEncoderData = encoders;
+    encoderLock.unlock();
   }
-  encoderLock.unlock();
 }
 
 void LKRoverHW::waitForSerial() {
