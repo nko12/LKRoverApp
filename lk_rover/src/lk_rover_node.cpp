@@ -59,7 +59,9 @@ int main(int argc, char** argv) {
     }
     hw = gazeboHW;
   } else {
-    hw = std::make_shared<LKRoverHW>();
+    hw = std::make_shared<LKRoverHW>(nh);
+    // wait for the rosserial link to connect
+    dynamic_cast<LKRoverHW>(hw)->waitForSerial();
   }
 
   ActuatorConfigs dumpConfigs = {0}, ladderConfigs = {0};
@@ -107,10 +109,10 @@ int main(int argc, char** argv) {
       toStop,
       2); // STRICT
 
-  auto rover = LKController(nh, nhPrivate);
+  auto master = LKController(nh, nhPrivate);
 
   while (true) {
-    rover.doStuff();
+    master.doStuff();
     ros::spinOnce();
   }
 
