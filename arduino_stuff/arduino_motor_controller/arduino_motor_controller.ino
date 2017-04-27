@@ -32,12 +32,22 @@ ros::NodeHandle  nh;
 
 Servo frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel,
   leftDumpLift, rightDumpLift, leftLadderLift, rightLadderLift,
-  ladderSpin;
+  ladderSpin, bucketFlap;
 
 
 void servo_cb( const lk_rover::AllPWMs& cmd_msg){
   // TODO
-  ladderSpin.write(cmd_msg.front_left);
+  frontLeftWheel.write(cmd_msg.front_left);
+  frontRightWheel.write(cmd_msg.front_right);
+  backLeftWheel.write(cmd_msg.back_left);
+  backRightWheel.write(cmd_msg.back_right);
+  leftDumpLift.write(cmd_msg.bucket_left);
+  rightDumpLift.write(cmd_msg.bucket_right);
+  leftLadderLift.write(cmd_msg.ladder_left);
+  rightLadderLift.write(cmd_msg.ladder_right);
+  ladderSpin.write(cmd_msg.bucket_spin);
+  bucketFlap.write(cms_msg.bucket_flap);
+
   // digitalWrite(13, HIGH-digitalRead(13)); 
 }
 
@@ -124,11 +134,12 @@ void setup(){
   leftLadderLift.attach(8);
   rightLadderLift.attach(9);
   ladderSpin.attach(10);
+  bucketFlap.attach(11);
 }
 
 void loop() {
   getEncoderVals();
   encoderPub.publish(&encoderVals);
   nh.spinOnce();
-  //delay(1);
+  delay(1);
 }
