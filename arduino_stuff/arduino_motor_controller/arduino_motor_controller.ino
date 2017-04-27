@@ -46,7 +46,7 @@ void servo_cb( const lk_rover::AllPWMs& cmd_msg){
   leftLadderLift.write(cmd_msg.ladder_left);
   rightLadderLift.write(cmd_msg.ladder_right);
   ladderSpin.write(cmd_msg.bucket_spin);
-  bucketFlap.write(cms_msg.bucket_flap);
+  bucketFlap.write(cmd_msg.bucket_flap);
 
   // digitalWrite(13, HIGH-digitalRead(13)); 
 }
@@ -96,19 +96,40 @@ private:
 };
 template <int A, int B> volatile int QuadatureEncoder<A, B>::isrCount = 0;
 
+class PotSensor: public Encoder {
+public:
+  PotSensor(int pin, float &output): pin(pin), ref(output) {;}
+  void init() {
+    pinMode(pin, INPUT); 
+  }
+  void readEncoders() {
+    ref = static_cast<float>(analogRead(pin));
+  }
+
+  const int pin;
+  float &ref;
+};
+
 const int numQuadEncoders = 4;
+const int numPotSensors = 4;
 
 QuadatureEncoder<22, 23> frontLeftEnc(encoderVals.front_left_enc);
 QuadatureEncoder<24, 25> frontRightEnc(encoderVals.front_right_enc);
 QuadatureEncoder<26, 27> backLeftEnc(encoderVals.back_left_enc);
 QuadatureEncoder<28, 29> backRightEnc(encoderVals.back_right_enc);
 
-Encoder *encoders[numQuadEncoders] = {
-  &frontLeftEnc, &frontRightEnc, &backLeftEnc, &backRightEnc
+PotSensor bucketLeftEnc(A0, encoderVals.bucket_left_enc);
+PotSensor bucketRightEnc(A1, encoderVals.bucket_right_enc);
+PotSensor ladderLeftEnc(A2, encoderVals.ladder_left_enc);
+PotSensor ladderRightEnc(A3, encoderVals.ladder_right_enc);
+
+Encoder *encoders[numQuadEncoders + numPotSensors] = {
+  &frontLeftEnc, &frontRightEnc, &backLeftEnc, &backRightEnc,
+  &bucketLeftEnc, &bucketRightEnc, &ladderLeftEnc, &ladderRightEnc
 };
 
 void getEncoderVals() {
-  for (int i = 0; i < numQuadEncoders; ++i) {
+  for (int i = 0; i < sizeof(encoders)/sizeof(encoders[0]); ++i) {
     Encoder& enc = *encoders[i];
     enc.readEncoders();
   }
