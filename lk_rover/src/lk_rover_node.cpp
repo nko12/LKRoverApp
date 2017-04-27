@@ -66,21 +66,74 @@ int main(int argc, char** argv) {
 
   ActuatorConfigs dumpConfigs = {0}, ladderConfigs = {0};
 
-  nhPrivate.param("dump/left/min", dumpConfigs.left.min);
-  nhPrivate.param("dump/left/max", dumpConfigs.left.max);
-  nhPrivate.param("dump/left/gain", dumpConfigs.left.gain);
-  nhPrivate.param("dump/right/min", dumpConfigs.right.min);
-  nhPrivate.param("dump/right/max", dumpConfigs.right.max);
-  nhPrivate.param("dump/right/gain", dumpConfigs.right.gain);
-  nhPrivate.param("dump/diff_gain", dumpConfigs.diffGain);
+  bool configFail = false;
+  if (!nh.getParam("dump/left/min", dumpConfigs.left.min)) {
+    ROS_ERROR("unable to find dump left min");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/left/max", dumpConfigs.left.max)) {
+    ROS_ERROR("unable to find dump left max");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/left/gain", dumpConfigs.left.gain)) {
+    ROS_ERROR("unable to find dump left gain");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/right/min", dumpConfigs.right.min)) {
+    ROS_ERROR("unable to find dump right min");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/right/max", dumpConfigs.right.max)) {
+    ROS_ERROR("unable to find dump left max");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/right/gain", dumpConfigs.right.gain)) {
+    ROS_ERROR("unable to find dump right gain");
+    configFail = true;
+  }
+  if (!nh.param("dump/diff_gain", dumpConfigs.diffGain)) {
+    ROS_ERROR("unable to find dump diff gain");
+    configFail = true;
+  }
+  ROS_INFO("dump params: %lf %lf %lf %lf %lf %lf %lf", 
+    dumpConfigs.left.min, dumpConfigs.left.max, dumpConfigs.left.gain,
+    dumpConfigs.right.min, dumpConfigs.right.max, dumpConfigs.right.gain,
+    dumpConfigs.diffGain);
 
-  nhPrivate.param("ladder/left/min", ladderConfigs.left.min);
-  nhPrivate.param("ladder/left/max", ladderConfigs.left.max);
-  nhPrivate.param("ladder/left/gain", ladderConfigs.left.gain);
-  nhPrivate.param("ladder/right/min", ladderConfigs.right.min);
-  nhPrivate.param("ladder/right/max", ladderConfigs.right.max);
-  nhPrivate.param("ladder/right/gain", ladderConfigs.right.gain);
-  nhPrivate.param("ladder/diff_gain", ladderConfigs.diffGain);
+  if (!nh.getParam("ladder/left/min", ladderConfigs.left.min)) {
+    ROS_ERROR("unable to find ladder left min");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/left/max", ladderConfigs.left.max)) {
+    ROS_ERROR("unable to find ladder left max");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/left/gain", ladderConfigs.left.gain)) {
+    ROS_ERROR("unable to find ladder left gain");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/right/min", ladderConfigs.right.min)) {
+    ROS_ERROR("unable to find ladder right min");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/right/max", ladderConfigs.right.max)) {
+    ROS_ERROR("unable to find ladder left max");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/right/gain", ladderConfigs.right.gain)) {
+    ROS_ERROR("unable to find ladder right gain");
+    configFail = true;
+  }
+  if (!nh.param("ladder/diff_gain", ladderConfigs.diffGain)) {
+    ROS_ERROR("unable to find ladder diff gain");
+    configFail = true;
+  }
+  ROS_INFO("ladder params: %lf %lf %lf %lf %lf %lf %lf", 
+    ladderConfigs.left.min, ladderConfigs.left.max, ladderConfigs.left.gain,
+    ladderConfigs.right.min, ladderConfigs.right.max, ladderConfigs.right.gain,
+    ladderConfigs.diffGain);
+
+  if (configFail) exit(-1);
 
   LKRover robot(hw, dumpConfigs, ladderConfigs);
   controller_manager::ControllerManager cm(&robot, nh);
@@ -111,7 +164,9 @@ int main(int argc, char** argv) {
 
   auto master = LKController(nh, nhPrivate);
 
+  auto r = ros::Rate(100);
   while (true) {
+    r.sleep();
     master.doStuff();
     ros::spinOnce();
   }

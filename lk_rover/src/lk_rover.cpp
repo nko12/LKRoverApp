@@ -54,17 +54,17 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
       "dump", &dumpPos, &dumpVel, &dumpAccel);
   auto dh = hardware_interface::JointHandle(dsh, &dumpPwm);
   jsi.registerHandle(dsh);
-  pji.registerHandle(dh);
+  vji.registerHandle(dh);
 
   auto lsh = hardware_interface::JointStateHandle(
       "ladder", &ladderPos, &ladderVel, &ladderAccel);
   auto lh = hardware_interface::JointHandle(lsh, &ladderPwm);
   jsi.registerHandle(lsh);
-  pji.registerHandle(lh);
+  vji.registerHandle(lh);
 
   registerInterface(&vji);
   registerInterface(&jsi);
-  registerInterface(&pji);
+  // registerInterface(&pji);
 
   // initialize all the PWM values
   double dumpA, dumpB, ladderA, ladderB;
@@ -80,6 +80,7 @@ void LKRover::write() {
   double dumpA, dumpB, ladderA, ladderB;
   virtualDump.getProcessedPwms(dumpPwm, dumpA, dumpB);
   virtualLadder.getProcessedPwms(ladderPwm, ladderA, ladderB);
+  ROS_INFO("pwms %lf %lf %lf %lf %lf %lf",  dumpA, dumpB, ladderA, ladderB, dumpPwm, ladderPwm);
 
   hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin, flap);
 }
