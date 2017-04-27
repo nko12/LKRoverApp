@@ -33,7 +33,7 @@ bool GazeboHW::init(ros::NodeHandle &nh) {
 }
 
 void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts,
-    double dumpA, double dumpB, double ladderA, double ladderB, double spin) {
+    double dumpA, double dumpB, double ladderA, double ladderB, double spin, double flap) {
   // TODO: set up the nonwheel actuators
   ROS_INFO("GazeboHW::setPWMs %f %f %f %f",
       newEfforts[0], newEfforts[1], newEfforts[2], newEfforts[3]);

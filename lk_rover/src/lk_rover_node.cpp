@@ -61,26 +61,26 @@ int main(int argc, char** argv) {
   } else {
     hw = std::make_shared<LKRoverHW>(nh);
     // wait for the rosserial link to connect
-    dynamic_cast<LKRoverHW>(hw)->waitForSerial();
+    dynamic_cast<LKRoverHW*>(hw.get())->waitForSerial();
   }
 
   ActuatorConfigs dumpConfigs = {0}, ladderConfigs = {0};
 
-  nhPrivate.params("dump/left/min", dumpConfigs.left.min);
-  nhPrivate.params("dump/left/max", dumpConfigs.left.max);
-  nhPrivate.params("dump/left/gain", dumpConfigs.left.gain);
-  nhPrivate.params("dump/right/min", dumpConfigs.right.min);
-  nhPrivate.params("dump/right/max", dumpConfigs.right.max);
-  nhPrivate.params("dump/right/gain", dumpConfigs.right.gain);
-  nhPrivate.params("dump/diff_gain", dumpConfigs.diffGain);
+  nhPrivate.param("dump/left/min", dumpConfigs.left.min);
+  nhPrivate.param("dump/left/max", dumpConfigs.left.max);
+  nhPrivate.param("dump/left/gain", dumpConfigs.left.gain);
+  nhPrivate.param("dump/right/min", dumpConfigs.right.min);
+  nhPrivate.param("dump/right/max", dumpConfigs.right.max);
+  nhPrivate.param("dump/right/gain", dumpConfigs.right.gain);
+  nhPrivate.param("dump/diff_gain", dumpConfigs.diffGain);
 
-  nhPrivate.params("ladder/left/min", ladderConfigs.left.min);
-  nhPrivate.params("ladder/left/max", ladderConfigs.left.max);
-  nhPrivate.params("ladder/left/gain", ladderConfigs.left.gain);
-  nhPrivate.params("ladder/right/min", ladderConfigs.right.min);
-  nhPrivate.params("ladder/right/max", ladderConfigs.right.max);
-  nhPrivate.params("ladder/right/gain", ladderConfigs.right.gain);
-  nhPrivate.params("ladder/diff_gain", ladderConfigs.diffGain);
+  nhPrivate.param("ladder/left/min", ladderConfigs.left.min);
+  nhPrivate.param("ladder/left/max", ladderConfigs.left.max);
+  nhPrivate.param("ladder/left/gain", ladderConfigs.left.gain);
+  nhPrivate.param("ladder/right/min", ladderConfigs.right.min);
+  nhPrivate.param("ladder/right/max", ladderConfigs.right.max);
+  nhPrivate.param("ladder/right/gain", ladderConfigs.right.gain);
+  nhPrivate.param("ladder/diff_gain", ladderConfigs.diffGain);
 
   LKRover robot(hw, dumpConfigs, ladderConfigs);
   controller_manager::ControllerManager cm(&robot, nh);

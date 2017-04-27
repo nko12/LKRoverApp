@@ -28,9 +28,9 @@ struct ActuatorConfigs {
 class TwinJoints {
 public:
   const ActuatorConfig a, b;
-  const diffGain;
+  const double diffGain;
 
-  TwinJoints(const ActuatorConfig &a_, const ActuatorConfig &b_);
+  TwinJoints(const ActuatorConfigs &);
   ~TwinJoints() {}
 
   double getProcessedEncoder(double inA, double inB);
@@ -41,7 +41,7 @@ private:
 
 class LKRover: public hardware_interface::RobotHW {
 public:
-  LKRover(std::shared_ptr<LKHW> hw_);
+  LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfigs& ladder);
   ~LKRover();
 
   void write();
@@ -59,6 +59,7 @@ private:
   double dumpPwm, ladderPwm;
 
   double spin;
+  double flap;
 
   hardware_interface::VelocityJointInterface vji;
   hardware_interface::PositionJointInterface pji;
