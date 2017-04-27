@@ -154,6 +154,9 @@ int main(int argc, char** argv) {
 
   std::atomic<bool> running(true);
 
+  // read the values at startup
+  robot.read();
+
   std::thread controlThread([&]() {
     auto r = ros::Rate(50);
     auto curTime = ros::Time::now();
@@ -172,12 +175,24 @@ int main(int argc, char** argv) {
     "lk_ladder_controller",
     "lk_spin_controller",
     "lk_flap_controller",
-};
+  };
   auto toStop = std::vector<std::string>{};
   cm.switchController(
       toStart,
       toStop,
       2); // STRICT
+
+// NOT WORKING
+#if 0
+  {
+    auto ladder_controller = static_cast<velocity_controllers::JointPositionController*>(cm.getControllerByName("lk_ladder_controller"));
+    if (ladder_controller != nullptr) {
+      ladder_controller->setCommand(0.20);
+    } else {
+      ROS_WARN("unable to set ladder controller start position");
+    }
+  }
+#endif
 
   auto master = LKController(nh, nhPrivate);
 

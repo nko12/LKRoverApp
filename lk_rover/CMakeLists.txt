@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   diff_drive_controller
+  velocity_controllers
   hardware_interface
   controller_manager
   controller_manager_msgs
@@ -114,7 +115,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lk_rover
- CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs message_runtime
+ CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs message_runtime velocity_controllers
 #  DEPENDS system_lib
 )
 
