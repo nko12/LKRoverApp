@@ -1,7 +1,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include <sys/iotctl.h>
+#include <sys/ioctl.h>
 #include <linux/joystick.h>
 
 #include "ros/ros.h"
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "lk_teleop");
 
   auto nh = ros::NodeHandle();
-  auto nh = ros::NodeHandle("~");
+  auto nhPriv = ros::NodeHandle("~");
 
   ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
@@ -23,13 +23,13 @@ int main(int argc, char **argv) {
     exit(-1);
   }
 
-  int numAxis = 0, numButtons = 0;
+  int numAxes = 0, numButtons = 0;
   char joystickName[80];
-	ioctl(joy_fd, JSIOCGAXES, &numAxis);
+	ioctl(joy_fd, JSIOCGAXES, &numAxes);
 	ioctl(joy_fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(joy_fd, JSIOCGNAME(80), &joystickName);
 
-  int *axes = new int[numAxis];
+  int *axes = new int[numAxes];
   char *buttons = new char[numButtons];
 
   ROS_INFO("Found joystick %s with %d axes and %d buttons", joystickName, numAxes, numButtons);
@@ -37,26 +37,26 @@ int main(int argc, char **argv) {
   struct js_event js;
   while (1) {
     if (read(joy_fd, &js, sizeof(js)) < 0) {
-      fprintf(sderr, "unable to read controller\n");
+      fprintf(stderr, "unable to read controller\n");
       exit(-2);
     }
     switch (js.type & ~JS_EVENT_INIT) {
       case JS_EVENT_AXIS:
-        axis[js.number] = js.value;
+        axes[js.number] = js.value;
         break;
       case JS_EVENT_BUTTON:
-        button[js.number] = js.value;
+        buttons[js.number] = js.value;
         break;
     }
-		for(int i = 0; i < numAxis; ++i)
+		for(int i = 0; i < numAxes; ++i)
 			printf("a %d:%6d ", i, axes[i]);
 		for(int i = 0; i < numButtons; ++i)
-			printf("b %d: %d ", i, button[i]);
+			printf("b %d: %d ", i, buttons[i]);
 		printf("  \r");
 		fflush(stdout);
   }
 
-  close(controller_fd);
+  close(joy_fd);
 
   return 0;
 }
