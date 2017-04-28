@@ -116,7 +116,7 @@
     <parent link="base_link"/>
     <child link="right_front_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz=".338836 .40005 0"/>
+    <origin xyz=".2667 .365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -124,7 +124,7 @@
     <parent link="base_link"/>
     <child link="left_front_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz="-.338836 .40005 0"/>
+    <origin xyz="-.2667 .365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -132,7 +132,7 @@
     <parent link="base_link"/>
     <child link="right_back_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz=".3302 -.40005 0"/>
+    <origin xyz=".2667 -.365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -140,7 +140,7 @@
     <parent link="base_link"/>
     <child link="left_back_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz="-.3302 -.40005 0"/>
+    <origin xyz="-.2667 -.365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
