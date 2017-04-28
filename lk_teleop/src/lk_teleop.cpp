@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <linux/joystick.h>
 
+#include <algorithm>
+
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/Float64.h"
@@ -18,10 +20,10 @@ int main(int argc, char **argv) {
   auto nh = ros::NodeHandle();
   auto nhPriv = ros::NodeHandle("~");
 
-  ros::Publisher pubBase = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+  ros::Publisher pubBase = nh.advertise<geometry_msgs::Twist>("/lk_velocity_controller/cmd_vel", 1);
   ros::Publisher pubLadderSpin = nh.advertise<std_msgs::Float64>("/ladder_spin", 1);
-  ros::Publisher pubBucketLift = nh.advertise<std_msgs::Float64>("/bucket_lift", 1);
-  ros::Publisher pubLadderLift = nh.advertise<std_msgs::Float64>("/ladder_lift", 1);
+  ros::Publisher pubBucketLift = nh.advertise<std_msgs::Float64>("/lk_dump_controller/command", 1);
+  ros::Publisher pubLadderLift = nh.advertise<std_msgs::Float64>("/lk_ladder_controller/command", 1);
   ros::Publisher pubFlapLift = nh.advertise<std_msgs::Float64>("/flap_lift", 1);
 
   int joy_fd = open("/dev/input/js0", O_RDONLY);
@@ -50,7 +52,7 @@ int main(int argc, char **argv) {
   struct timeval timeout;
 
 
-  while (1) {
+  while (!buttons[6]) {
     // printf("loop\n");
 
     FD_ZERO(&set);
@@ -69,13 +71,13 @@ int main(int argc, char **argv) {
 		if(js.number == 0 || js.number == 1){
 			float forceLin = axes[1];
 			float forceAng = axes[0];
-			if(forceLin <= 1000 && forceLin >= -1000)
+			if(forceLin <= 0.1*std::abs(forceAng) && forceLin >= -std::abs(forceAng))
 				forceLin = 0;
-			if(forceAng <= 1000 && forceAng >= -1000)
+			if(forceAng <= 0.1*std::abs(forceLin) && forceAng >= -std::abs(forceLin))
 				forceAng = 0;
 		        geometry_msgs::Twist msg = {};
-		        msg.linear.x = forceLin/(-32767.0);
-		        msg.angular.z = forceAng/32767.0;	
+		        msg.linear.x = forceLin/(-40*32767.0);
+		        msg.angular.z = forceAng/(-40*32767.0);	
 			pubBase.publish(msg);
 		}
 		if(js.number == 5){
@@ -137,10 +139,20 @@ int main(int argc, char **argv) {
             msg.data = ladderPos;
             pubLadderLift.publish(msg);
           }
+	if (buttons[6]){
+	//stop
+		close(joy_fd);
+		return 0;
+	}
+	if (buttons[7]){
+	//start
+		
+	}
        }
     } else {
       fprintf(stderr, "select() error\n");
     }
+    ros::spinOnce();
   }
 
   close(joy_fd);
