@@ -30,30 +30,38 @@
 
 ros::NodeHandle  nh;
 
+volatile bool received = false;
 Servo frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel,
   leftDumpLift, rightDumpLift, leftLadderLift, rightLadderLift,
   ladderSpin, bucketFlap;
 
+int clamped(float in) {
+  int out = (in * 500) + 1500;
+  if (out > 2000) out = 2000;
+  if (out < 1000) out = 1000;
+  return out;
+}
 
 void servo_cb( const lk_rover::AllPWMs& cmd_msg){
   // TODO
-  frontLeftWheel.write(cmd_msg.front_left);
-  frontRightWheel.write(cmd_msg.front_right);
-  backLeftWheel.write(cmd_msg.back_left);
-  backRightWheel.write(cmd_msg.back_right);
-  leftDumpLift.write(cmd_msg.bucket_left);
-  rightDumpLift.write(cmd_msg.bucket_right);
-  leftLadderLift.write(cmd_msg.ladder_left);
-  rightLadderLift.write(cmd_msg.ladder_right);
-  ladderSpin.write(cmd_msg.bucket_spin);
-  bucketFlap.write(cmd_msg.bucket_flap);
+  frontLeftWheel.writeMicroseconds(clamped(cmd_msg.front_left));
+  frontRightWheel.writeMicroseconds(clamped(cmd_msg.front_right));
+  backLeftWheel.writeMicroseconds(clamped(cmd_msg.back_left));
+  backRightWheel.writeMicroseconds(clamped(cmd_msg.back_right));
+  leftDumpLift.writeMicroseconds(clamped(cmd_msg.bucket_left));
+  rightDumpLift.writeMicroseconds(clamped(cmd_msg.bucket_right));
+  leftLadderLift.writeMicroseconds(clamped(cmd_msg.ladder_left));
+  rightLadderLift.writeMicroseconds(clamped(cmd_msg.ladder_right));
+  ladderSpin.writeMicroseconds(clamped(cmd_msg.bucket_spin));
+  bucketFlap.writeMicroseconds(clamped(cmd_msg.bucket_flap));
 
+  received = true;
   // digitalWrite(13, HIGH-digitalRead(13)); 
 }
 
 lk_rover::AllEncoders encoderVals;
 
-ros::Subscriber<lk_rover::AllPWMs> wheelSub("wheels", servo_cb);
+ros::Subscriber<lk_rover::AllPWMs> wheelSub("pwms", servo_cb);
 ros::Publisher encoderPub("encoders", &encoderVals);
 
 class Encoder {
@@ -136,6 +144,7 @@ void getEncoderVals() {
 }
 
 void setup(){
+  analogReadResolution(16);
   pinMode(13, OUTPUT);
 
   nh.initNode();
@@ -158,9 +167,31 @@ void setup(){
   bucketFlap.attach(11);
 }
 
+void killMotors() {
+  frontLeftWheel.writeMicroseconds(1500);
+  frontRightWheel.writeMicroseconds(1500);
+  backLeftWheel.writeMicroseconds(1500);
+  backRightWheel.writeMicroseconds(1500);
+  leftDumpLift.writeMicroseconds(1500);
+  rightDumpLift.writeMicroseconds(1500);
+  leftLadderLift.writeMicroseconds(1500);
+  rightLadderLift.writeMicroseconds(1500);
+  ladderSpin.writeMicroseconds(1500);
+}
+
+int timeout = 0;
 void loop() {
   getEncoderVals();
   encoderPub.publish(&encoderVals);
   nh.spinOnce();
+  if (!received) {
+    ++timeout;
+    if (timeout > 500) {
+      killMotors();
+    }
+  } else {
+    timeout = 0;
+    received = false;
+  }
   delay(1);
 }
