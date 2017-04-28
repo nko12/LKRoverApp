@@ -93,7 +93,7 @@ void LKRover::write() {
   double dumpA, dumpB, ladderA, ladderB;
   virtualDump.getProcessedPwms(dumpPwm, dumpA, dumpB);
   virtualLadder.getProcessedPwms(ladderPwm, ladderA, ladderB);
-  ROS_INFO("pwms %lf %lf %lf %lf %lf %lf",  dumpA, dumpB, ladderA, ladderB, dumpPwm, ladderPwm);
+  // ROS_INFO("pwms %lf %lf %lf %lf %lf %lf",  dumpA, dumpB, ladderA, ladderB, dumpPwm, ladderPwm);
 
   hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin, flap);
 }

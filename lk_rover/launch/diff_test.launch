@@ -1,4 +1,5 @@
 <launch>
+  <machine name="tegra" address="tegra-ubuntu"/>
   <rosparam command="load" file="$(find lk_rover)/config/control.yaml" />
   <param name="robot_description" textfile="$(find tesbot_description)/urdf/tesbot.urdf" />
   <node name="lk_rover_node" pkg="lk_rover" type="lk_rover_node" output="screen"/>

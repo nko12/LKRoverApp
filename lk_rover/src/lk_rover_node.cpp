@@ -146,20 +146,23 @@ int main(int argc, char** argv) {
   std::atomic<bool> running = true;
 
   std::thread controlThread([&]() {
-    auto r = ros::Rate(100);
+    auto r = ros::Rate(50);
     auto curTime = ros::Time::now();
     while (running) {
       r.sleep();
       robot.read();
       cm.update(curTime, r.cycleTime());
       robot.write();
+      // ROS_INFO("control loop");
     }
   });
 
   auto toStart = std::vector<std::string>{
     "lk_velocity_controller",
     "lk_dump_controller",
-    "lk_ladder_controller"};
+    "lk_ladder_controller",
+    // "lk_spin_controller",
+};
   auto toStop = std::vector<std::string>{};
   cm.switchController(
       toStart,
