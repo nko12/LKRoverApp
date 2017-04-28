@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
   auto nhPriv = ros::NodeHandle("~");
 
   ros::Publisher pubBase = nh.advertise<geometry_msgs::Twist>("/lk_velocity_controller/cmd_vel", 1);
-  ros::Publisher pubLadderSpin = nh.advertise<std_msgs::Float64>("/ladder_spin", 1);
+  ros::Publisher pubLadderSpin = nh.advertise<std_msgs::Float64>("/lk_spin_controller/command", 1);
   ros::Publisher pubBucketLift = nh.advertise<std_msgs::Float64>("/lk_dump_controller/command", 1);
   ros::Publisher pubLadderLift = nh.advertise<std_msgs::Float64>("/lk_ladder_controller/command", 1);
-  ros::Publisher pubFlapLift = nh.advertise<std_msgs::Float64>("/flap_lift", 1);
+  ros::Publisher pubFlapLift = nh.advertise<std_msgs::Float64>("/lk_flap_controller/command", 1);
 
   int joy_fd = open("/dev/input/js0", O_RDONLY);
   if (joy_fd == -1) {
