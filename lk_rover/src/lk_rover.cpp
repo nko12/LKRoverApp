@@ -21,6 +21,8 @@ void TwinJoints::getProcessedPwms(double pwm, double &outA, double &outB) {
   outB = b.gain * pwm * (1.0 + diffGain*diff);
 }
 
+double dummyVal = 0.0;
+
 LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfigs& ladder):
     virtualDump(dump),
     virtualLadder(ladder),
@@ -62,9 +64,20 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
   jsi.registerHandle(lsh);
   vji.registerHandle(lh);
 
+  auto ssh = hardware_interface::JointStateHandle(
+      "spin", &dummyVal, &dummyVal, &dummyVal);
+  auto sjh = hardware_interface::JointHandle(ssh, &spin);
+  eji.registerHandle(sjh);
+
+  auto fsh = hardware_interface::JointStateHandle(
+      "flap", &dummyVal, &dummyVal, &dummyVal);
+  auto fjh = hardware_interface::JointHandle(fsh, &spin);
+  pji.registerHandle(fjh);
+
   registerInterface(&vji);
   registerInterface(&jsi);
-  // registerInterface(&pji);
+  registerInterface(&pji);
+  registerInterface(&eji);
 
   // initialize all the PWM values
   double dumpA, dumpB, ladderA, ladderB;

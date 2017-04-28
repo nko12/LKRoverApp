@@ -64,6 +64,7 @@ private:
   hardware_interface::VelocityJointInterface vji;
   hardware_interface::PositionJointInterface pji;
   hardware_interface::JointStateInterface jsi;
+  hardware_interface::EffortJointInterface eji;
 
   std::shared_ptr<LKHW> hw;
   ros::Time lastTime;

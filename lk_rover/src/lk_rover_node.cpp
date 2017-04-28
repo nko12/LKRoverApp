@@ -140,11 +140,15 @@ int main(int argc, char** argv) {
   cm.loadController("lk_velocity_controller");
   cm.loadController("lk_dump_controller");
   cm.loadController("lk_ladder_controller");
+  cm.loadController("lk_spin_controller");
+  cm.loadController("lk_flap_controller");
+
+  std::atomic<bool> running = true;
 
   std::thread controlThread([&]() {
     auto r = ros::Rate(100);
     auto curTime = ros::Time::now();
-    while (true) {
+    while (running) {
       r.sleep();
       robot.read();
       cm.update(curTime, r.cycleTime());
@@ -165,11 +169,14 @@ int main(int argc, char** argv) {
   auto master = LKController(nh, nhPrivate);
 
   auto r = ros::Rate(100);
-  while (true) {
+  while (ros::ok()) {
     r.sleep();
     master.doStuff();
     ros::spinOnce();
   }
+
+  running.store(false);
+  controlThread.join();
 
   return 0;
 }
