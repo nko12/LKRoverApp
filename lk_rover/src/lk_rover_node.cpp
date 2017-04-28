@@ -1,3 +1,4 @@
+#include <atomic>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -143,7 +144,7 @@ int main(int argc, char** argv) {
   cm.loadController("lk_spin_controller");
   cm.loadController("lk_flap_controller");
 
-  std::atomic<bool> running = true;
+  std::atomic<bool> running(true);
 
   std::thread controlThread([&]() {
     auto r = ros::Rate(50);
