@@ -18,6 +18,7 @@ struct ActuatorConfig {
 struct ActuatorConfigs {
   ActuatorConfig left, right;
   double diffGain;
+  double length;
 };
 
 /// A helper class for converting a single PWM/encoder pair into two
@@ -29,6 +30,7 @@ class TwinJoints {
 public:
   const ActuatorConfig a, b;
   const double diffGain;
+  const double length;
 
   TwinJoints(const ActuatorConfigs &);
   ~TwinJoints() {}

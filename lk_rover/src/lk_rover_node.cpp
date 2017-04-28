@@ -92,8 +92,12 @@ int main(int argc, char** argv) {
     ROS_ERROR("unable to find dump right gain");
     configFail = true;
   }
-  if (!nh.param("dump/diff_gain", dumpConfigs.diffGain)) {
+  if (!nh.getParam("dump/diff_gain", dumpConfigs.diffGain)) {
     ROS_ERROR("unable to find dump diff gain");
+    configFail = true;
+  }
+  if (!nh.getParam("dump/length", dumpConfigs.length)) {
+    ROS_ERROR("unable to find dump diff length");
     configFail = true;
   }
   ROS_INFO("dump params: %lf %lf %lf %lf %lf %lf %lf", 
@@ -125,8 +129,12 @@ int main(int argc, char** argv) {
     ROS_ERROR("unable to find ladder right gain");
     configFail = true;
   }
-  if (!nh.param("ladder/diff_gain", ladderConfigs.diffGain)) {
+  if (!nh.getParam("ladder/diff_gain", ladderConfigs.diffGain)) {
     ROS_ERROR("unable to find ladder diff gain");
+    configFail = true;
+  }
+  if (!nh.getParam("ladder/length", ladderConfigs.length)) {
+    ROS_ERROR("unable to find ladder diff length");
     configFail = true;
   }
   ROS_INFO("ladder params: %lf %lf %lf %lf %lf %lf %lf", 

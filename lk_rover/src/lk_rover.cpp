@@ -1,7 +1,7 @@
 #include "lk_rover/lk_rover.h"
 
 TwinJoints::TwinJoints(const ActuatorConfigs &ac):
-  a(ac.left), b(ac.right), diffGain(ac.diffGain), lastA(0.0), lastB(0.0) {}
+  a(ac.left), b(ac.right), diffGain(ac.diffGain), length(ac.length), lastA(0.0), lastB(0.0) {}
 
 double TwinJoints::getProcessedEncoder(double inA, double inB) {
   // store the values so that they can be used for computing the necessary
@@ -9,16 +9,21 @@ double TwinJoints::getProcessedEncoder(double inA, double inB) {
   lastA = (inA - a.min)/(a.max - a.min);
   lastB = (inB - b.min)/(b.max - b.min);
 
+  // ROS_INFO("a b %lf %lf", lastA, lastB);
   // use the average as the position of the virtual actuator
-  return (lastA + lastB)/2;
+  // returns the virtual distance in meters
+  return length*(lastA + lastB)/2;
 }
 
 void TwinJoints::getProcessedPwms(double pwm, double &outA, double &outB) {
   // basically adjust the pwm output based on the discrepancy between the two
   // measured distances
-  const double diff = lastA - lastB;
-  outA = a.gain * pwm * (1.0 - diffGain*diff);
-  outB = b.gain * pwm * (1.0 + diffGain*diff);
+  // ROS_INFO("pwm %lf", pwm);
+  double diff = lastA - lastB;
+  if (std::abs(diff) <= 0.001) diff = 0.0;
+  outA = a.gain * (pwm - diffGain*diff);
+  outB = b.gain * (pwm + diffGain*diff);
+  ROS_INFO("diff %lf %lf %lf %lf", diffGain, diff, outA, outB);
 }
 
 double dummyVal = 0.0;

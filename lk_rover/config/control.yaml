@@ -1,23 +1,25 @@
 dump:
   left:
-    min: 0.0
-    max: 50000.0
-    gain: 10.0
+    min: 362.0
+    max: 604.0
+    gain: 25.0
   right:
-    min: 0.0
-    max: 50000.0
-    gain: 10.0
+    min: 35.0
+    max: 281.0
+    gain: 25.0
   diff_gain: 1.0
+  length: 0.20
 ladder:
   left:
-    min: 0.0
-    max: 100000.0
-    gain: 10.0
+    min: 430.0
+    max: 602.0
+    gain: 8.0
   right:
-    min: 0.0
-    max: 100000.0
+    min: 405.0
+    max: 580.0
     gain: 10.0
-  diff_gain: 1.0
+  diff_gain: 0.5
+  length: 0.20
 
 lk_velocity_controller:
   type: "diff_drive_controller/DiffDriveController"
@@ -57,12 +59,12 @@ lk_velocity_controller:
 lk_dump_controller:
   type: "velocity_controllers/JointPositionController"
   joint: "dump"
-  pid: {p: 100.0, i: 0.01, d: 10.0}
+  pid: {p: 1.0, i: 0.00, d: 0.0}
 
 lk_ladder_controller:
   type: "velocity_controllers/JointPositionController"
   joint: "ladder"
-  pid: {p: 100.0, i: 0.01, d: 10.0}
+  pid: {p: 1.0, i: 0.00, d: 0.0}
 
 lk_spin_controller:
   type: "effort_controllers/JointEffortController"

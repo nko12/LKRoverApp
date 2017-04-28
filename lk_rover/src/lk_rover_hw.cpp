@@ -12,14 +12,14 @@ LKRoverHW::LKRoverHW(ros::NodeHandle nh): nh(nh) {
 void LKRoverHW::setPWMs(const std::array<double, kNumWheels>& pwms,
     double dumpA, double dumpB, double ladderA, double ladderB, double spin, double flap) {
   lk_rover::AllPWMs allPwms;
-  // allPwms.bucket_left = dumpA;
-  // allPwms.bucket_right = dumpB;
+  allPwms.bucket_left = -dumpA;
+  allPwms.bucket_right = -dumpB;
 
   allPwms.bucket_spin = spin;
   allPwms.bucket_flap = flap;
 
-  // allPwms.ladder_left = ladderA;
-  // allPwms.ladder_right = ladderB;
+  allPwms.ladder_left = -ladderA;
+  allPwms.ladder_right = -ladderB;
 
   allPwms.front_left = pwms[0];
   allPwms.back_left = pwms[1];
