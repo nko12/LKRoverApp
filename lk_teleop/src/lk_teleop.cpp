@@ -50,9 +50,41 @@ int main(int argc, char **argv) {
 
   fd_set set;
   struct timeval timeout;
+  bool started = false;
+  ROS_INFO("Waiting for start...");
+  while (!started && ros::ok()) {
+    FD_ZERO(&set);
+    FD_SET(joy_fd, &set);
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 20000;
+    int rv = select(joy_fd + 1, &set, NULL, NULL, &timeout);
 
+    if (rv > 0) {
+      if (read(joy_fd, &js, sizeof(js)) < 0) {
+        fprintf(stderr, "unable to read controller\n");
+        exit(-2);
+      }
+      switch (js.type & ~JS_EVENT_INIT) {
+      case JS_EVENT_AXIS:
+        axes[js.number] = js.value;
+        break;
+      case JS_EVENT_BUTTON:
+        buttons[js.number] = js.value;
+        if (buttons[7]) {
+          started = true;
+        }
+        if (buttons[6]) {
+          ros::shutdown();
+        }
 
-  while (!buttons[6]) {
+        break;
+      }
+    }
+    ros::spinOnce();
+  }
+
+  ROS_INFO("Start detected! Beginning transmission..");
+  while (ros::ok()) {
     // printf("loop\n");
 
     FD_ZERO(&set);
@@ -109,6 +141,9 @@ int main(int argc, char **argv) {
 			msg.data = pos;
 			pubFlapLift.publish(msg);		
 		}	
+    if (buttons[6]) {
+      ros::shutdown();
+    }
 
 		break;
 	    }
@@ -139,15 +174,6 @@ int main(int argc, char **argv) {
             msg.data = ladderPos;
             pubLadderLift.publish(msg);
           }
-	if (buttons[6]){
-	//stop
-		close(joy_fd);
-		return 0;
-	}
-	if (buttons[7]){
-	//start
-		
-	}
        }
     } else {
       fprintf(stderr, "select() error\n");
