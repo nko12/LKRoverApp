@@ -103,32 +103,32 @@ int main(int argc, char **argv) {
 		if(js.number == 0 || js.number == 1){
 			float forceLin = axes[1];
 			float forceAng = axes[0];
-			if(forceLin <= 0.1*std::abs(forceAng) && forceLin >= -std::abs(forceAng))
+			if(forceLin <= 0.2*std::abs(forceAng) && forceLin >= -0.2*std::abs(forceAng))
 				forceLin = 0;
-			if(forceAng <= 0.1*std::abs(forceLin) && forceAng >= -std::abs(forceLin))
+			if(forceAng <= 0.2*std::abs(forceLin) && forceAng >= -0.2*std::abs(forceLin))
 				forceAng = 0;
 		        geometry_msgs::Twist msg = {};
 		        msg.linear.x = forceLin/(-40*32767.0);
-		        msg.angular.z = forceAng/(-40*32767.0);	
+		        msg.angular.z = forceAng/(-20*32767.0);	
 			pubBase.publish(msg);
 		}
 		if(js.number == 5){
-			float force = axes[5];
+			int force = axes[5];
 		        std_msgs::Float64 msg;
 
-			if(force >= 0.0)
-		        	msg.data = (force/(32767.0));
-			else
-				msg.data = (0.0);
+			if(force >= 0)
+		        	msg.data = (force/(32767.0)*0.75);
+			// else
+				// msg.data = (0.0);
 			pubLadderSpin.publish(msg);
 		}
 		if(js.number == 2){
-			float force = axes[2];
+			int force = axes[2];
 			std_msgs::Float64 msg;
 			if(force >= 0)
-				msg.data = (-force/(32767.0));
-			else
-				msg.data = (0.0);
+				msg.data = (-force/(32767.0)*0.75);
+			// else
+				// msg.data = (0.0);
 			pubLadderSpin.publish(msg);
 		}
 		
@@ -159,9 +159,9 @@ int main(int argc, char **argv) {
        // printf("timeout\n");
        if (buttons[0] || buttons[1] || buttons[2] || buttons[3]) {
           if (buttons[1] || buttons[3]) {
-            bucketPos += 0.01*(buttons[3] - buttons[1]);
-            if (bucketPos > 1.00) bucketPos = 1.00;
-            if (bucketPos < 0.00) bucketPos = 0.00;
+            bucketPos += 0.001*(buttons[3] - buttons[1]);
+            if (bucketPos > 0.25) bucketPos = 0.25;
+            if (bucketPos < -0.05) bucketPos = -0.05;
             std_msgs::Float64 msg;
             msg.data = bucketPos;
             pubBucketLift.publish(msg);
