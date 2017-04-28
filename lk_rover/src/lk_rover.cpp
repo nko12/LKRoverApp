@@ -71,7 +71,7 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
 
   auto fsh = hardware_interface::JointStateHandle(
       "flap", &dummyVal, &dummyVal, &dummyVal);
-  auto fjh = hardware_interface::JointHandle(fsh, &spin);
+  auto fjh = hardware_interface::JointHandle(fsh, &flap);
   pji.registerHandle(fjh);
 
   registerInterface(&vji);

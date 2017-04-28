@@ -162,7 +162,8 @@ int main(int argc, char** argv) {
     "lk_velocity_controller",
     "lk_dump_controller",
     "lk_ladder_controller",
-    // "lk_spin_controller",
+    "lk_spin_controller",
+    "lk_flap_controller",
 };
   auto toStop = std::vector<std::string>{};
   cm.switchController(
