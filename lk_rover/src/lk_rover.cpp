@@ -46,7 +46,8 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
     hw(hw_),
     lastTime(ros::Time::now()),
     spin(0.0),
-    flap(0.0) {
+    flap(0.0),
+    killed(false) {
   
   for (int i = 0; i < kNumWheels; ++i) {
     auto jsh = hardware_interface::JointStateHandle(
@@ -95,11 +96,11 @@ LKRover::~LKRover() {
 }
 
 void LKRover::killMotors() {
-  dumpPwm = 0.0;
-  ladderPwm = 0.0;
-  for (auto &pwm: wheelPwms) {
-    pwm = 0.0;
-  }
+  killed = true;
+}
+
+void LKRover::unkillMotors() {
+  killed = false;
 }
 
 void LKRover::write() {
@@ -108,6 +109,17 @@ void LKRover::write() {
   virtualLadder.getProcessedPwms(ladderPwm, ladderA, ladderB);
   // ROS_INFO("pwms %lf %lf %lf %lf %lf %lf",  dumpA, dumpB, ladderA, ladderB, dumpPwm, ladderPwm);
 
+  if (killed) {
+    dumpA = 0.0;
+    dumpB = 0.0;
+    ladderA = 0.0;
+    ladderB = 0.0;
+    spin = 0.0;
+    flap = 0.0;
+    for (auto &pwm: wheelPwms) {
+      pwm = 0.0;
+    }
+  }
   hw->setPWMs(wheelPwms, dumpA, dumpB, ladderA, ladderB, spin, flap);
 }
 

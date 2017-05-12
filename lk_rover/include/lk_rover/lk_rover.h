@@ -49,7 +49,9 @@ public:
   void write();
   void read();
   void killMotors();
+  void unkillMotors();
 private:
+  bool killed;
   TwinJoints virtualDump, virtualLadder;
 
   std::array<double, kNumWheels> wheelPoss;

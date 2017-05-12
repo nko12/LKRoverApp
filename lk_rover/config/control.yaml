@@ -1,22 +1,22 @@
 dump:
   left:
-    min: 362.0
-    max: 604.0
+    min: 355.0
+    max: 600.0
     gain: 25.0
   right:
-    min: 35.0
-    max: 281.0
+    min: 27.0
+    max: 283.0
     gain: 25.0
   diff_gain: 1.0
   length: 0.20
 ladder:
   left:
-    min: 430.0
-    max: 602.0
+    min: 395.0
+    max: 582.0
     gain: 8.0
   right:
-    min: 405.0
-    max: 580.0
+    min: 401.0
+    max: 587.0
     gain: 10.0
   diff_gain: 0.5
   length: 0.20

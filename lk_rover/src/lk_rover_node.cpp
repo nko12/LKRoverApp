@@ -173,6 +173,7 @@ int main(int argc, char** argv) {
       r.sleep();
       robot.read();
       if (!killMotors) {
+        robot.unkillMotors();
         cm.update(curTime, r.cycleTime());
       } else {
         robot.killMotors();
