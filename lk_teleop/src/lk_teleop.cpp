@@ -11,6 +11,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/Float64.h"
+#include "std_msgs/Bool.h"
 // lots of code copied from http://www.cs.uleth.ca/~holzmann/C/system/ttyraw.c
 struct termios origTermios;
 
@@ -25,6 +26,8 @@ int main(int argc, char **argv) {
   ros::Publisher pubBucketLift = nh.advertise<std_msgs::Float64>("/lk_dump_controller/command", 1);
   ros::Publisher pubLadderLift = nh.advertise<std_msgs::Float64>("/lk_ladder_controller/command", 1);
   ros::Publisher pubFlapLift = nh.advertise<std_msgs::Float64>("/lk_flap_controller/command", 1);
+
+  ros::Publisher heartbeat = nh.advertise<std_msgs::Bool>("/heartbeat", 1);
 
   int joy_fd = open("/dev/input/js0", O_RDONLY);
   if (joy_fd == -1) {
@@ -84,8 +87,11 @@ int main(int argc, char **argv) {
   }
 
   ROS_INFO("Start detected! Beginning transmission..");
+  std_msgs::Bool heartbeatMsg;
+  heartbeatMsg.data = true;
   while (ros::ok()) {
     // printf("loop\n");
+    heartbeat.publish(heartbeatMsg);
 
     FD_ZERO(&set);
     FD_SET(joy_fd, &set);

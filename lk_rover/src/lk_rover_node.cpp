@@ -8,6 +8,8 @@
 #include "ros/ros.h"
 #include "ros/console.h"
 
+#include "std_msgs/Bool.h"
+
 #include "gazebo_msgs/SpawnModel.h"
 
 #include "controller_manager/controller_manager.h"
@@ -17,6 +19,11 @@
 #include "lk_rover/lk_rover.h"
 #include "lk_rover/lk_rover_hw.h"
 #include "lk_rover/gazebo_hw.h"
+
+std::atomic<bool> receivedHeartbeat(false);
+void teleopHeartCb(const std_msgs::Bool &b) {
+  receivedHeartbeat.store(true);
+};
 
 bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate);
 
@@ -155,12 +162,8 @@ int main(int argc, char** argv) {
   bool teleopMode = false;
 
   std::atomic<bool> running(true);
-  std::atomic<bool> receivedHeartbeat(false);
   std::atomic<bool> killMotors(false);
 
-  auto teleopHeartCb = [&](const &std_msgs::Bool b) {
-    receivedHeartbeat.store(true);
-  }
   auto heartSub = nh.subscribe("heartbeat", 1, teleopHeartCb);
 
   std::thread controlThread([&]() {
