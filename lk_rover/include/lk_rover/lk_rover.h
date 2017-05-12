@@ -48,6 +48,7 @@ public:
 
   void write();
   void read();
+  void killMotors();
 private:
   TwinJoints virtualDump, virtualLadder;
 

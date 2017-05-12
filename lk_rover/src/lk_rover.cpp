@@ -23,7 +23,7 @@ void TwinJoints::getProcessedPwms(double pwm, double &outA, double &outB) {
   if (std::abs(diff) <= 0.001) diff = 0.0;
   outA = a.gain * (pwm - diffGain*diff);
   outB = b.gain * (pwm + diffGain*diff);
-  ROS_INFO("diff %lf %lf %lf %lf", diffGain, diff, outA, outB);
+  // ROS_INFO("diff %lf %lf %lf %lf", diffGain, diff, outA, outB);
 }
 
 double dummyVal = 0.0;
@@ -39,7 +39,7 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
     dumpVel(0.0),
     dumpAccel(0.0),
     dumpPwm(0.0),
-    ladderPos(0.0),
+    ladderPos(0.2),
     ladderVel(0.0),
     ladderAccel(0.0),
     ladderPwm(0.0),
@@ -92,6 +92,14 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
 }
 
 LKRover::~LKRover() {
+}
+
+void LKRover::killMotors() {
+  dumpPwm = 0.0;
+  ladderPwm = 0.0;
+  for (auto &pwm: wheelPwms) {
+    pwm = 0.0;
+  }
 }
 
 void LKRover::write() {

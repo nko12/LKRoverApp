@@ -108,8 +108,8 @@ int main(int argc, char **argv) {
 			if(forceAng <= 0.2*std::abs(forceLin) && forceAng >= -0.2*std::abs(forceLin))
 				forceAng = 0;
 		        geometry_msgs::Twist msg = {};
-		        msg.linear.x = forceLin/(-40*32767.0);
-		        msg.angular.z = forceAng/(-20*32767.0);	
+		        msg.linear.x = forceLin/(-20*32767.0);
+		        msg.angular.z = forceAng/(32767.0);	
 			pubBase.publish(msg);
 		}
 		if(js.number == 5){

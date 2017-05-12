@@ -152,10 +152,16 @@ int main(int argc, char** argv) {
   cm.loadController("lk_spin_controller");
   cm.loadController("lk_flap_controller");
 
-  std::atomic<bool> running(true);
+  bool teleopMode = false;
 
-  // read the values at startup
-  robot.read();
+  std::atomic<bool> running(true);
+  std::atomic<bool> receivedHeartbeat(false);
+  std::atomic<bool> killMotors(false);
+
+  auto teleopHeartCb = [&](const &std_msgs::Bool b) {
+    receivedHeartbeat.store(true);
+  }
+  auto heartSub = nh.subscribe("heartbeat", 1, teleopHeartCb);
 
   std::thread controlThread([&]() {
     auto r = ros::Rate(50);
@@ -163,7 +169,11 @@ int main(int argc, char** argv) {
     while (running) {
       r.sleep();
       robot.read();
-      cm.update(curTime, r.cycleTime());
+      if (!killMotors) {
+        cm.update(curTime, r.cycleTime());
+      } else {
+        robot.killMotors();
+      }
       robot.write();
       // ROS_INFO("control loop");
     }
@@ -182,24 +192,32 @@ int main(int argc, char** argv) {
       toStop,
       2); // STRICT
 
-// NOT WORKING
-#if 0
-  {
-    auto ladder_controller = static_cast<velocity_controllers::JointPositionController*>(cm.getControllerByName("lk_ladder_controller"));
-    if (ladder_controller != nullptr) {
-      ladder_controller->setCommand(0.20);
-    } else {
-      ROS_WARN("unable to set ladder controller start position");
-    }
-  }
-#endif
-
   auto master = LKController(nh, nhPrivate);
 
   auto r = ros::Rate(100);
+  const int kTimeoutTime = 20;
+  auto teleopTimeout = kTimeoutTime;
   while (ros::ok()) {
     r.sleep();
-    master.doStuff();
+    if (!teleopMode) {
+      master.doStuff();
+    } else {
+      // teleop mode;
+      if (!receivedHeartbeat) {
+        --teleopTimeout;
+      } else {
+        teleopTimeout = kTimeoutTime;
+        killMotors.store(false);
+      }
+      if (teleopTimeout < 0) {
+        ROS_WARN("teleop connection loss detected; killing motors");
+        killMotors.store(true);
+      }
+    }
+    if (receivedHeartbeat) {
+      teleopMode = true;
+    }
+    receivedHeartbeat.store(false);
     ros::spinOnce();
   }
 
