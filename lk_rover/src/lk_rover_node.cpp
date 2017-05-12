@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
         teleopTimeout = kTimeoutTime;
         killMotors.store(false);
       }
-      if (teleopTimeout < 0) {
+      if (teleopTimeout == 0) {
         ROS_WARN("teleop connection loss detected; killing motors");
         killMotors.store(true);
       }
