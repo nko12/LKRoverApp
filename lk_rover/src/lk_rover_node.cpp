@@ -162,28 +162,8 @@ int main(int argc, char** argv) {
 
   if (configFail) exit(-1);
 
-  std::atomic<bool> running(true);
-  std::atomic<bool> killMotors(false);
-
   LKRover robot(hw, dumpConfigs, ladderConfigs);
   controller_manager::ControllerManager cm(&robot, nh);
-
-  std::thread controlThread([&]() {
-    auto r = ros::Rate(50);
-    auto curTime = ros::Time::now();
-    while (running) {
-      robot.read();
-      if (!killMotors) {
-        robot.unkillMotors();
-        cm.update(curTime, r.cycleTime());
-      } else {
-        robot.killMotors();
-      }
-      robot.write();
-      r.sleep();
-      // ROS_INFO("control loop");
-    }
-  });
 
   cm.loadController("lk_velocity_controller");
   cm.loadController("lk_dump_controller");
@@ -193,7 +173,27 @@ int main(int argc, char** argv) {
 
   bool teleopMode = false;
 
+  std::atomic<bool> running(true);
+  std::atomic<bool> killMotors(false);
+
   auto heartSub = nh.subscribe("heartbeat", 1, teleopHeartCb);
+
+  std::thread controlThread([&]() {
+    auto r = ros::Rate(50);
+    auto curTime = ros::Time::now();
+    while (running) {
+      r.sleep();
+      robot.read();
+      if (!killMotors) {
+        robot.unkillMotors();
+        cm.update(curTime, r.cycleTime());
+      } else {
+        robot.killMotors();
+      }
+      robot.write();
+      // ROS_INFO("control loop");
+    }
+  });
 
   auto toStart = std::vector<std::string>{
     "lk_velocity_controller",
@@ -207,7 +207,6 @@ int main(int argc, char** argv) {
       toStart,
       toStop,
       2); // STRICT
-
 
   auto master = LKController(nh, nhPrivate);
 

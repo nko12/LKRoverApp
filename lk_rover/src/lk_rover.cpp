@@ -89,7 +89,7 @@ LKRover::LKRover(std::shared_ptr<LKHW> hw_, ActuatorConfigs& dump, ActuatorConfi
   double dumpA, dumpB, ladderA, ladderB;
   hw->getCount(wheelPoss, dumpA, dumpB, ladderA, ladderB);
   dumpPos = virtualDump.getProcessedEncoder(dumpA, dumpB);
-  ladderPos = virtualDump.getProcessedEncoder(ladderA, ladderB);
+  // ladderPos = virtualDump.getProcessedEncoder(ladderA, ladderB);
 }
 
 LKRover::~LKRover() {
