@@ -10,22 +10,28 @@
 
 #include "std_msgs/Bool.h"
 
-#include "gazebo_msgs/SpawnModel.h"
-
 #include "controller_manager/controller_manager.h"
 #include "controller_manager_msgs/SwitchController.h"
 
 #include "lk_rover/lk_controller.h"
 #include "lk_rover/lk_rover.h"
 #include "lk_rover/lk_rover_hw.h"
+
+#undef USE_GAZEBO
+
+#if USE_GAZEBO
+
+#include "gazebo_msgs/SpawnModel.h"
 #include "lk_rover/gazebo_hw.h"
+
+bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate);
+
+#endif
 
 std::atomic<bool> receivedHeartbeat(false);
 void teleopHeartCb(const std_msgs::Bool &b) {
   receivedHeartbeat.store(true);
 };
-
-bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate);
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "lk_rover_base");
@@ -33,10 +39,12 @@ int main(int argc, char** argv) {
   auto nh = ros::NodeHandle();
   auto nhPrivate = ros::NodeHandle("~");
 
+  std::shared_ptr<LKHW> hw;
+#if USE_GAZEBO
+
   bool useGazebo = false;
   nhPrivate.param<bool>("use_gazebo", useGazebo, false);
 
-  std::shared_ptr<LKHW> hw;
   if (useGazebo) {
     ROS_INFO("waiting for gazebo...");
     int timeout_count = 5;
@@ -67,10 +75,13 @@ int main(int argc, char** argv) {
     }
     hw = gazeboHW;
   } else {
+#endif
     hw = std::make_shared<LKRoverHW>(nh);
     // wait for the rosserial link to connect
     dynamic_cast<LKRoverHW*>(hw.get())->waitForSerial();
+#if USE_GAZEBO
   }
+#endif
 
   ActuatorConfigs dumpConfigs = {0}, ladderConfigs = {0};
 
@@ -231,6 +242,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 
+#if USE_GAZEBO
 bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate) {
   // copy the model into a string to pass into the model spawner
   std::string model_path = "";
@@ -273,3 +285,4 @@ bool SpawnModel(ros::NodeHandle& nh, ros::NodeHandle& nhPrivate) {
   }
   return true;
 }
+#endif

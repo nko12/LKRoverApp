@@ -58,7 +58,7 @@
   <run_depend>diff_drive_controller</run_depend>
   <run_depend>velocity_controllers</run_depend>
   <run_depend>effort_controllers</run_depend>
-  <run_depend>positoin_controllers</run_depend>
+  <run_depend>position_controllers</run_depend>
   <run_depend>message_runtime</run_depend>
 
 
