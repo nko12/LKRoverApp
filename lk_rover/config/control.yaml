@@ -1,24 +1,24 @@
 dump:
   left:
-    min: 355.0
-    max: 600.0
+    min: 356.0
+    max: 601.0
     gain: 25.0
   right:
-    min: 27.0
-    max: 283.0
+    min: 51.0
+    max: 304.0
     gain: 25.0
   diff_gain: 1.0
   length: 0.20
 ladder:
   left:
     min: 395.0
-    max: 582.0
-    gain: 8.0
-  right:
-    min: 401.0
-    max: 587.0
+    max: 586.0
     gain: 10.0
-  diff_gain: 0.5
+  right:
+    min: 350.0
+    max: 536.0
+    gain: 6.0
+  diff_gain: 1.5
   length: 0.20
 
 lk_velocity_controller:
