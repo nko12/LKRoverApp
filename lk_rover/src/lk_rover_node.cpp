@@ -165,6 +165,9 @@ int main(int argc, char** argv) {
   std::atomic<bool> running(true);
   std::atomic<bool> killMotors(false);
 
+  LKRover robot(hw, dumpConfigs, ladderConfigs);
+  controller_manager::ControllerManager cm(&robot, nh);
+
   std::thread controlThread([&]() {
     auto r = ros::Rate(50);
     auto curTime = ros::Time::now();
@@ -182,8 +185,6 @@ int main(int argc, char** argv) {
     }
   });
 
-  LKRover robot(hw, dumpConfigs, ladderConfigs);
-  controller_manager::ControllerManager cm(&robot, nh);
   cm.loadController("lk_velocity_controller");
   cm.loadController("lk_dump_controller");
   cm.loadController("lk_ladder_controller");
