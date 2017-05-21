@@ -121,11 +121,23 @@ int main(int argc, char **argv) {
 		if(js.number == 0 || js.number == 1){
 			float forceLin = axes[1];
 			float forceAng = axes[0];
+                        auto sgn = [](float x) -> float {
+                          if (x > 0.0)
+                            return 1.0;
+                          else if (x < 0.0)
+                            return -1.0;
+                          else
+                            return 0.0;
+                        };
 			//create threshold for cancelling out noise for slight changes in joystick direction, make it more digital rather than analog for better control with the diff drive controller on our very long base
 			if(forceLin <= 0.2*std::abs(forceAng) && forceLin >= -0.2*std::abs(forceAng))
 				forceLin = 0;
+                        else 
+                                forceLin -= 0.2*sgn(forceLin);
 			if(forceAng <= 0.2*std::abs(forceLin) && forceAng >= -0.2*std::abs(forceLin))
 				forceAng = 0;
+                        else 
+                                forceAng -= 0.2*sgn(forceAng);
 		        geometry_msgs::Twist msg = {};
 			//lower the output of the publisher values -20 for linear and -5 for angular gives ideal results (32767 is xbox 1 constant)
 		        msg.linear.x = forceLin/(-20*32767.0);
