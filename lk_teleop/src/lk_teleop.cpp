@@ -133,11 +133,11 @@ int main(int argc, char **argv) {
 			if(forceLin <= 0.2*std::abs(forceAng) && forceLin >= -0.2*std::abs(forceAng))
 				forceLin = 0;
                         else 
-                                forceLin -= 0.2*sgn(forceLin);
+                                forceLin -= 0.2*std::abs(forceAng)*sgn(forceLin);
 			if(forceAng <= 0.2*std::abs(forceLin) && forceAng >= -0.2*std::abs(forceLin))
 				forceAng = 0;
                         else 
-                                forceAng -= 0.2*sgn(forceAng);
+                                forceAng -= 0.2*std::abs(forceLin)*sgn(forceAng);
 		        geometry_msgs::Twist msg = {};
 			//lower the output of the publisher values -20 for linear and -5 for angular gives ideal results (32767 is xbox 1 constant)
 		        msg.linear.x = forceLin/(-20*32767.0);
