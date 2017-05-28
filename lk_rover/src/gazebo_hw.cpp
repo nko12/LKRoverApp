@@ -4,6 +4,7 @@
 #include "gazebo_msgs/JointRequest.h"
 
 #include "lk_rover/common.h"
+#include "lk_rover/lk_rover.h"
 #include "lk_rover/gazebo_hw.h"
 
 constexpr double kForceTol = 0.001;
@@ -31,7 +32,9 @@ bool GazeboHW::init(ros::NodeHandle &nh) {
   return true;
 }
 
-void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts) {
+void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts,
+    double dumpA, double dumpB, double ladderA, double ladderB, double spin, double flap) {
+  // TODO: set up the nonwheel actuators
   ROS_INFO("GazeboHW::setPWMs %f %f %f %f",
       newEfforts[0], newEfforts[1], newEfforts[2], newEfforts[3]);
   for (int i = 0; i < kNumWheels; ++i) {
@@ -69,7 +72,9 @@ void GazeboHW::setPWMs(const std::array<double, kNumWheels>& newEfforts) {
   }
 }
 
-void GazeboHW::getCount(std::array<double, kNumWheels>& count) {
+void GazeboHW::getCount(std::array<double, kNumWheels>& count,
+    double &dumpA, double& dumpB, double &ladderA, double &ladderB) {
+  // TODO: set up the nonwheel actuators
   for (auto i = 0; i < kNumWheels; ++i) {
     gazebo_msgs::GetJointProperties gjp;
 

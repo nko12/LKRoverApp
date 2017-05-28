@@ -116,7 +116,7 @@
     <parent link="base_link"/>
     <child link="right_front_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz=".338836 .40005 0"/>
+    <origin xyz=".2667 .365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -124,7 +124,7 @@
     <parent link="base_link"/>
     <child link="left_front_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz="-.338836 .40005 0"/>
+    <origin xyz="-.2667 .365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -132,7 +132,7 @@
     <parent link="base_link"/>
     <child link="right_back_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz=".3302 -.40005 0"/>
+    <origin xyz=".2667 -.365125 0"/>
     <dynamics damping="0.7"/>
   </joint>
 
@@ -140,8 +140,25 @@
     <parent link="base_link"/>
     <child link="left_back_wheel"/>
     <axis xyz="1 0 0"/>
-    <origin xyz="-.3302 -.40005 0"/>
+    <origin xyz="-.2667 -.365125 0"/>
     <dynamics damping="0.7"/>
+  </joint>
+
+  <!-- fake joints because the virtual actuator joints need children -->
+  <link name="dump_end">
+  </link>
+  <link name="ladder_end">
+  </link>
+
+  <joint name="dump" type="prismatic">
+    <parent link="base_link"/>
+    <child link="dump_end"/>
+    <limit upper="0.20" effort="90" velocity="1000"/>
+  </joint>
+  <joint name="ladder" type="prismatic">
+    <parent link="base_link"/>
+    <child link="ladder_end"/>
+    <limit upper="0.20" effort="90" velocity="1000"/>
   </joint>
 
   <!-- http://gazebosim.org/tutorials?tut=ros_gzplugins -->

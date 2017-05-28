@@ -11,10 +11,23 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   diff_drive_controller
+  velocity_controllers
   hardware_interface
   controller_manager
   controller_manager_msgs
+  message_generation
 )
+
+find_package(gazebo)
+
+if(gazebo_FOUND)
+    list(APPEND MY_SRCS src/gazebo_hw.cpp)
+    list(APPEND MY_LINK_INCLUDE_DIRS ${gazebo_INCLUDE_DIRS})
+    list(APPEND MY_LINK_LIBRARIES ${gazebo_LIBRARIES})
+    # Anything else you need to do to enable use of the optional dep, like add definitions
+    add_definitions("-DUSE_GAZEBO=1")
+endif()
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -55,6 +68,11 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message1.msg
 #   Message2.msg
 # )
+add_message_files(
+    FILES
+    AllPWMs.msg
+    AllEncoders.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -71,10 +89,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,9 +126,10 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lk_rover
- CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs diff_drive_controller hardware_interface controller_manager controller_manager_msgs message_runtime velocity_controllers
 #  DEPENDS system_lib
 )
+
 
 ###########
 ## Build ##
@@ -136,10 +155,10 @@ include_directories(
 
 # Declare a C++ executable
 add_executable(lk_rover_node 
+  src/lk_controller.cpp
   src/lk_rover_node.cpp
   src/lk_rover.cpp
-  src/lk_rover_hw.cpp
-  src/gazebo_hw.cpp)
+  src/lk_rover_hw.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

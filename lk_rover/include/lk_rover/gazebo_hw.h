@@ -12,8 +12,11 @@ class GazeboHW: public LKHW {
 public:
   GazeboHW();
   bool init(ros::NodeHandle &nh);
-  void setPWMs(const std::array<double, kNumWheels>&);
-  void getCount(std::array<double, kNumWheels>&);
+  // TODO: wrap PWMs/encoder values in a struct
+  void setPWMs(const std::array<double, kNumWheels>&,
+      double dumpA, double dumpB, double ladderA, double ladderB, double spin, double flap);
+  void getCount(std::array<double, kNumWheels>&,
+      double &dumpA, double &dumpB, double &ladderA, double &ladderB);
 private:
   ros::ServiceClient mj, cj, gj;
 
