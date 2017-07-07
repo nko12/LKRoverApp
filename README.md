@@ -32,6 +32,16 @@ cd ~/catkin_ws
 catkin_make
 ```
 
+
+## Order to read files
+These are currently fully commented:
+- lk\_rover/src/lk\_rover\_node.cpp
+- lk\_rover/src/lk\_rover\_controller.cpp
+- lk\_rover/src/lk\_rover.cpp
+- lk\_rover/src/lk\_rover\_hw.cpp
+- lk\_rover/src/gazebo\_hw.cpp
+- arduino\_stuff/arduino\_motor\_controller/arduino\_motor\_controller.ino
+
 ## Useful references
 http://wiki.ros.org/roscpp/Overview/Services
 http://wiki.ros.org/roscpp/Overview/Publishers%20and%20Subscribers
